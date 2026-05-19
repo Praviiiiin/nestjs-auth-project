@@ -11,18 +11,18 @@ export class User {
     @Prop({
         required: true,
     })
-    name!: string;
+    name! :string;
 
     @Prop({
         required:true,
         unique:true
     })
-    email!: string;
+    email! :string;
 
     @Prop({
         required:true
     })
-    password!: string
+    password! :string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
