@@ -13,10 +13,11 @@ import { User, UserSchema } from "./schemas/user.schema"
       },
     ]),
   ],
-  providers: [UsersService],
-  exports: [UsersService],
   controllers: [
     UsersController,
   ],
+  providers: [UsersService],
+  exports: [UsersService], 
 })
+
 export class UsersModule {}
