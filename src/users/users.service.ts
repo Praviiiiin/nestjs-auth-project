@@ -22,4 +22,17 @@ export class UsersService {
     async findById(id: string) {
         return this.userModel.findById(id);
     }
+
+    async updateUser(
+        id: string,
+        updateData: any,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            updateData,
+            {
+                new: true,
+            },
+        );
+    }
 }
