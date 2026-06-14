@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService  } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 
+
 @Injectable()
 export class AuthService {
     constructor(
@@ -58,6 +59,42 @@ export class AuthService {
             message: 'Login Successful',
             access_token: token,
         });
+    }
+
+    async changePassword(
+        userId: string,
+        currentPassword: string,  
+        newPassword: string,      
+    ) {
+        const user = await this.userService.findById(
+            userId,
+        );
+
+        if(!user) {
+            throw new BadRequestException(
+                'User not found',
+            );
+        }
+
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+        if(!isPasswordValid) {
+            throw new BadRequestException(
+                'Current password is invalid'
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await this.userService.updatePassword(
+            userId,
+            hashedPassword,
+        );
+
+        return {
+            message:
+            'Password changed successfully'
+        };
     }
     
 }
