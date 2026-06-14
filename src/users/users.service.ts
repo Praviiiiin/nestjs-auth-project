@@ -35,4 +35,19 @@ export class UsersService {
             },
         );
     }
+
+    async updatePassword(
+        id: string,
+        password: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                password,
+            },
+            {
+                new: true
+            },
+        );
+    }
 }
