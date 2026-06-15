@@ -2,12 +2,12 @@ import { Body, Controller, Patch, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth-guard";
 import { CurrentUser } from "src/auth/decorators/current-user.decorator";
 import { UsersService } from "./users.service";
-import { UpdateUserDto } from "./update-user.dto";
+import { UpdateUserDto } from "src/auth/dto/update-user.dto";
 
 @Controller('users')
 export class UsersController {
     constructor(
-        private usersService : UsersService
+        private usersService : UsersService,
     ) {}
 
     @UseGuards(JwtAuthGuard)
@@ -22,5 +22,5 @@ export class UsersController {
             user._id,
             updateUserDto
         );
-    }
+    }    
 }
