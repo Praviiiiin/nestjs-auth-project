@@ -5,6 +5,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { CurrentUser } from './decorators/current-user.decorator'
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 
 @Controller('auth')
@@ -19,6 +20,16 @@ export class AuthController {
     @Post('login')
     login(@Body() body: LoginDto) {
         return this.authService.login(body);
+    }
+
+    @Post('refresh')
+    refresh(
+        @Body()
+        dto: RefreshTokenDto,
+    ) {
+        return this.authService.refreshToken(
+            dto.refreshToken,
+        );
     }
 
     @UseGuards(JwtAuthGuard)
