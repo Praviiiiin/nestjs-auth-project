@@ -50,4 +50,33 @@ export class UsersService {
             },
         );
     }
+
+    async updateRefreshToken (
+        id: string,
+        refreshToken: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                refreshToken,
+            },
+            {
+                new: true,
+            },
+        );
+    }
+
+    async removeRefreshToken(
+        id: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                refreshToken: null
+            },
+            {
+                new: true,
+            },
+        );
+    }
 }
