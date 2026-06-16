@@ -52,6 +52,17 @@ export class AuthController {
             dto.newPassword,
         )
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('logout')
+    logout(
+        @CurrentUser() user: any
+    ) {
+        return this.authService.logout(
+            user._id,
+        );
+    }
+
 }
 
 
