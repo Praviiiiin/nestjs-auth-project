@@ -31,7 +31,7 @@ export class UsersService {
             id,
             updateData,
             {
-                new: true,
+                returnDocument: "after",
             },
         );
     }
@@ -46,7 +46,7 @@ export class UsersService {
                 password,
             },
             {
-                new: true
+                returnDocument: "after"
             },
         );
     }
@@ -61,7 +61,7 @@ export class UsersService {
                 refreshToken,
             },
             {
-                new: true,
+                returnDocument: "after",
             },
         );
     }
@@ -75,7 +75,7 @@ export class UsersService {
                 refreshToken: null
             },
             {
-                new: true,
+                returnDocument: "after",
             },
         );
     }
