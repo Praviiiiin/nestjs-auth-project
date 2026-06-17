@@ -6,6 +6,7 @@ import { UpdateUserDto } from "src/auth/dto/update-user.dto";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { User } from "./schemas/user.schema";
+import { Role } from "src/auth/enums/role.enum";
 
 @Controller('users')
 export class UsersController {
@@ -31,7 +32,7 @@ export class UsersController {
         JwtAuthGuard,
         RolesGuard,
     )
-    @Roles('admin')
+    @Roles(Role.ADMIN)
     @Get('admin')
     adminRoute(
         @CurrentUser()
@@ -42,4 +43,12 @@ export class UsersController {
             user,
         };
     }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @Get()
+    getAllUsers() {
+        return this.usersService.findAll();
+    }
+
 }
