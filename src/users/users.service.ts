@@ -79,4 +79,8 @@ export class UsersService {
             },
         );
     }
+
+    async findAll() {
+        return this.userModel.find();
+    }
 }
