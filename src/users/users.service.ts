@@ -83,4 +83,14 @@ export class UsersService {
     async findAll() {
         return this.userModel.find();
     }
+
+    async findUserById(
+        id: string,
+    ) {
+        return this.userModel.findById(id);
+    }
+
+    async deleteUser(id: string) {
+        return this.userModel.findByIdAndDelete(id);
+    }
 }
