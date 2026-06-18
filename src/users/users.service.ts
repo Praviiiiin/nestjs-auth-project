@@ -81,13 +81,13 @@ export class UsersService {
     }
 
     async findAll() {
-        return this.userModel.find();
+        return this.userModel.find().select('-password -refreshToken');
     }
 
     async findUserById(
         id: string,
     ) {
-        return this.userModel.findById(id);
+        return this.userModel.findById(id).select('-password -refreshToken');
     }
 
     async deleteUser(id: string) {
