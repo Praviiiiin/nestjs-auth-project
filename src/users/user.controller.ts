@@ -91,4 +91,13 @@ export class UsersController {
         );
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('me')
+    getMe(
+        @CurrentUser() 
+        user: any
+    ) {
+        return user;
+    }
+
 }
