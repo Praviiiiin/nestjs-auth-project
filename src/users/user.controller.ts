@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, UseGuards, Get, Param, Delete } from "@nestjs/common";
+import { Body, Controller, Patch, UseGuards, Get, Param, Delete, Query } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth-guard";
 import { CurrentUser } from "src/auth/decorators/current-user.decorator";
 import { UsersService } from "./users.service";
@@ -6,7 +6,8 @@ import { UpdateUserDto } from "src/auth/dto/update-user.dto";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Role } from "src/auth/enums/role.enum";
-
+import { UpdateRoleDto } from "src/auth/dto/update-role.dto";
+import { PaginationDto } from "src/auth/dto/pagination.dto";
 
 @Controller('users')
 export class UsersController {
@@ -47,8 +48,11 @@ export class UsersController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Get()
-    getAllUsers() {
-        return this.usersService.findAll();
+    getAllUsers(
+        @Query()
+        query: PaginationDto
+    ) {
+        return this.usersService.findAll(Number(query.page) || 1, Number(query.limit) || 10, query.search || '');
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -69,6 +73,22 @@ export class UsersController {
         id: string,
     ) {
         return this.usersService.deleteUser(id);
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @Patch(':id/role')
+    updateRole(
+        @Param('id')
+        id: string,
+
+        @Body()
+        dto: UpdateRoleDto
+    ) {
+        return this.usersService.updateRole(
+            id,
+            dto.role,
+        );
     }
 
 }
