@@ -6,7 +6,10 @@ import { LoginDto } from './dto/login.dto';
 import { CurrentUser } from './decorators/current-user.decorator'
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
+@Controller('auth')
 
 @Controller('auth')
 export class AuthController {
@@ -62,6 +65,7 @@ export class AuthController {
             user._id,
         );
     }
+
 
 }
 
