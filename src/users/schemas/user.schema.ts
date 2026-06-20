@@ -33,6 +33,12 @@ export class User {
     })
     role!: Role;
 
+    @Prop()
+    resetPassword?: string;
+
+    @Prop()
+    resetPasswordExpires?: Date;
+
 }    
 
 export const UserSchema = SchemaFactory.createForClass(User)
