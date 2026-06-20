@@ -8,6 +8,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Role } from "src/auth/enums/role.enum";
 import { UpdateRoleDto } from "src/auth/dto/update-role.dto";
 import { PaginationDto } from "src/auth/dto/pagination.dto";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
 @Controller('users')
 export class UsersController {
@@ -98,6 +99,6 @@ export class UsersController {
         user: any
     ) {
         return user;
-    }
+    }    
 
 }
