@@ -8,9 +8,12 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Role } from "src/auth/enums/role.enum";
 import { UpdateRoleDto } from "src/auth/dto/update-role.dto";
 import { PaginationDto } from "src/auth/dto/pagination.dto";
-import { ApiBearerAuth } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
+
 export class UsersController {
     constructor(
         private usersService : UsersService,
