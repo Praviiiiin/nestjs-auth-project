@@ -166,5 +166,20 @@ export class UsersService {
             },
         });
     }
+
+    async clearResetToken(
+        id: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                resetPasswordToken: null,
+                resetPasswordExpires: null,
+            },
+            {
+                returnDocument: 'after'
+            },
+        );
+    }
 }
 
