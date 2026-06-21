@@ -1,7 +1,5 @@
-import {
-    Injectable,
-    BadRequestException,
-} from '@nestjs/common';
+import {Injectable, BadRequestException} from '@nestjs/common';
+import * as crypto from 'crypto'
 
 import * as bcrypt from 'bcrypt';
 
@@ -216,5 +214,29 @@ export class AuthService {
         return {
             message: 'Logged out successfully'
         };
+    }
+
+    async forgotPassword(
+        email: string,
+    ) { const user = await this.userService.findByEmail(email)
+
+        if(!user) {
+            throw new BadRequestException(
+                'User not found'
+            );
+        }
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const expires = new Date(Date.now() + 3600000 );
+
+        await this.userService.updateResetToken(
+            user._id.toString(),
+            token,
+            expires,
+        );
+
+        return {
+            message: 'Password reset token generated', token
+        }
     }
 }
