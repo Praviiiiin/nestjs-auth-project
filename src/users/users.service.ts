@@ -138,5 +138,33 @@ export class UsersService {
             }
         ).select('-password -refreshToken');
     }
+
+    async updateResetToken(
+        id: string,
+        token: string,
+        expires: Date,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                resetPasswordToken: token,
+                resetPasswordExpires: expires,
+            },
+            {
+                returnDocument: 'after'
+            },
+        );
+    }
+
+    async findResetToken(
+        token: string,
+    ) {
+        return this.userModel.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: {
+                $gt: new Date(),
+            },
+        });
+    }
 }
 
