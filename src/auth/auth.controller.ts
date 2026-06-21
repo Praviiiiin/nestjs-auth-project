@@ -7,6 +7,9 @@ import { CurrentUser } from './decorators/current-user.decorator'
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ForgotPasswordDto } from './dto/forgot-passsword.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -63,6 +66,27 @@ export class AuthController {
     ) {
         return this.authService.logout(
             user._id,
+        );
+    }
+
+    @Post('forgot-password')
+    forgotPassword(
+        @Body()
+        dto: ForgotPasswordDto,
+    ) {
+        return this.authService.forgotPassword(
+            dto.email,
+        );
+    }
+
+    @Post('reset-password')
+    resetPassword(
+        @Body()
+        dto: ResetPasswordDto
+    ) {
+        return this.authService.resetPassword(
+            dto.token,
+            dto.newPassword
         );
     }
 
