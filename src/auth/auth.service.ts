@@ -239,4 +239,29 @@ export class AuthService {
             message: 'Password reset token generated', token
         }
     }
+
+    async resetPassword(
+        token: string,
+        newPassword: string
+    ) {
+        const user = await this.userService.findResetToken(
+            token,
+        );
+
+        if(!user) {
+            throw new BadRequestException(
+                'Invalid or expired token',
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await this.userService.updatePassword(user._id.toString(), hashedPassword);
+
+        await this.userService.clearResetToken(user._id.toString())
+
+        return {
+            message: "Password reset successful"
+        }
+    }
 }
