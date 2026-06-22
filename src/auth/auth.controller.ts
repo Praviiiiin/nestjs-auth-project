@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Req, UseGuards, Patch  } from '@nestjs/common';
+import { Controller, Body, Post, Get, UseGuards, Patch, Query  } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
 import { RegisterDto } from './dto/register.dto';
@@ -87,6 +87,16 @@ export class AuthController {
         return this.authService.resetPasswordToken(
             dto.token,
             dto.newPassword
+        );
+    }
+
+    @Get('verify-email')
+    verifyEmail(
+        @Query('token')
+        token: string,
+    ) {
+        return this.authService.verifyEmail(
+            token,
         );
     }
 
