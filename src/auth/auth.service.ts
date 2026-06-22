@@ -273,4 +273,27 @@ export class AuthService {
             message: "Password reset successful"
         }
     }
+
+    async verifyEmail(
+        token: string,
+    ) {
+        const user = await this.userService.findByVerificationToken(
+            token,
+        );
+
+        if(!user) {
+            throw new BadRequestException(
+                'Invalid token'
+            );
+        }
+
+        user.isVerified = true;
+        user.emailVerificationToken = undefined;
+
+        await user.save();
+
+        return {
+            message: 'Email verified Successfully'
+        }
+    }
 }
