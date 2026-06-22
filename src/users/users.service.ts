@@ -181,5 +181,13 @@ export class UsersService {
             },
         );
     }
+
+    async findByVerificationToken(
+        token: string,
+    ) {
+        return this.userModel.findOne({
+            emailVerificationToken: token,
+        });
+    }
 }
 
