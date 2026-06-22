@@ -34,10 +34,18 @@ export class User {
     role!: Role;
 
     @Prop()
-    resetPassword?: string;
+    resetPasswordToken?: string;
 
     @Prop()
     resetPasswordExpires?: Date;
+
+    @Prop({
+        default: false,
+    })
+    isVerified!: boolean;
+
+    @Prop()
+    emailVerificationToken?: string;
 
 }    
 
