@@ -240,7 +240,7 @@ export class AuthService {
         }
     }
 
-    async resetPassword(
+    async resetPasswordToken(
         token: string,
         newPassword: string
     ) {
