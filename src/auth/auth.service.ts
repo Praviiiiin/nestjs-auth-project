@@ -30,11 +30,14 @@ export class AuthService {
         const hashedPassword =
             await bcrypt.hash(password, 10);
 
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
         const user =
             await this.userService.create({
                 name,
                 email,
                 password: hashedPassword,
+                emailVerificationToken: verificationToken,
             });
 
         return {
@@ -67,6 +70,12 @@ export class AuthService {
         if (!isPasswordValid) {
             throw new BadRequestException(
                 'Invalid Credentials',
+            );
+        }
+
+        if(!user.isVerified) {
+            throw new BadRequestException(
+                'Please verify your email first',
             );
         }
 
