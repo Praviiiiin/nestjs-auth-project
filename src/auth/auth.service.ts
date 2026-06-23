@@ -1,16 +1,16 @@
 import {Injectable, BadRequestException} from '@nestjs/common';
 import * as crypto from 'crypto'
-
 import * as bcrypt from 'bcrypt';
-
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UsersService,
         private jwtService: JwtService,
+        private mailService: MailService
     ) {}
 
     async register(body: any) {
