@@ -40,6 +40,11 @@ export class AuthService {
                 emailVerificationToken: verificationToken,
             });
 
+        await this.mailService.sendVerificationEmail(
+            email,
+            verificationToken,
+        );
+
         return {
             message:
                 'User registered successfully. Please verify your email.', verificationToken            
