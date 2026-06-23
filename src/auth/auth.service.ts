@@ -42,8 +42,7 @@ export class AuthService {
 
         return {
             message:
-                'User registered successfully',
-            user,
+                'User registered successfully. Please verify your email.', verificationToken            
         };
     }
 
