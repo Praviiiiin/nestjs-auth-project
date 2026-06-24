@@ -47,7 +47,7 @@ export class AuthService {
 
         return {
             message:
-                'User registered successfully. Please verify your email.', verificationToken            
+                'User registered successfully. Please verify your email.'            
         };
     }
 
@@ -253,7 +253,7 @@ export class AuthService {
         }
     }
 
-    async resetPasswordToken(
+    async resetPassword(
         token: string,
         newPassword: string
     ) {
@@ -297,7 +297,7 @@ export class AuthService {
         await user.save();
 
         return {
-            message: 'Email verified Successfully'
+            message: 'Email verified successfully'
         }
     }
 }
