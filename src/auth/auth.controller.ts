@@ -80,11 +80,11 @@ export class AuthController {
     }
 
     @Post('reset-password')
-    resetPasswordToken(
+    resetPassword(
         @Body()
         dto: ResetPasswordDto
     ) {
-        return this.authService.resetPasswordToken(
+        return this.authService.resetPassword(
             dto.token,
             dto.newPassword
         );
