@@ -34,7 +34,7 @@ export class User {
     role!: Role;
 
     @Prop()
-    resetPasswordToken?: string;
+    resetPassword?: string;
 
     @Prop()
     resetPasswordExpires?: Date;
