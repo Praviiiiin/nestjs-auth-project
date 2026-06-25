@@ -65,6 +65,14 @@ export class AuthService {
             );
         }
 
+        if(
+            user.lockUntill && user.lockUntill > new Date()
+        ) {
+            throw new BadRequestException(
+                'Account is temporarily locked. Try again later.'
+            );
+        }
+
         const isPasswordValid =
             await bcrypt.compare(
                 password,
