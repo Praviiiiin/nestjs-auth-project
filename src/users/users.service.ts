@@ -189,5 +189,22 @@ export class UsersService {
             emailVerificationToken: token,
         });
     }
+
+    async updateLoginAttemps(
+        id: string,
+        attempts: number,
+        lockUntill?: Date,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                failedLoginAttempts: attempts,
+                lockUntill,
+            },
+            {
+                returnDocument: 'after'
+            },
+        );
+    }
 }
 
