@@ -9,6 +9,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ForgotPasswordDto } from './dto/forgot-passsword.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 
 
 @ApiTags('Authentication')
@@ -98,6 +99,16 @@ export class AuthController {
         return this.authService.verifyEmail(
             token,
         );
+    }
+
+    @Post('resend-verification')
+    resendVerification(
+        @Body()
+        dto: ResendVerificationDto
+    ) {
+        return this.authService.resendVerification(
+            dto.email
+        )
     }
 
 }
