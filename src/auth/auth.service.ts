@@ -303,6 +303,40 @@ export class AuthService {
 
         return {
             message: 'Email verified successfully'
+        };
+    }
+
+    async resendVerification(
+        email: string
+    ) {
+        const user = await this.userService.findByEmail(
+            email,
+        );
+
+        if(!user) {
+            throw new BadRequestException(
+                'User not found'
+            );
         }
+
+        if(user?.isVerified) {
+            throw new BadRequestException(
+                'Email already verified'
+            );
+        }
+
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
+        user.emailVerificationToken = verificationToken;
+        await user.save();
+
+        await this.mailService.sendVerificationEmail(
+            email,
+            verificationToken,
+        );
+
+        return {
+            message: 'Verification email sent successfully'
+        };
     }
 }
