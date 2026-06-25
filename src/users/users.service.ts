@@ -147,7 +147,7 @@ export class UsersService {
         return this.userModel.findByIdAndUpdate(
             id,
             {
-                resetPasswordToken: token,
+                resetPassword: token,
                 resetPasswordExpires: expires,
             },
             {
@@ -160,7 +160,7 @@ export class UsersService {
         token: string,
     ) {
         return this.userModel.findOne({
-            resetPasswordToken: token,
+            resetPassword: token,
             resetPasswordExpires: {
                 $gt: new Date(),
             },
@@ -173,7 +173,7 @@ export class UsersService {
         return this.userModel.findByIdAndUpdate(
             id,
             {
-                resetPasswordToken: null,
+                resetPassword: null,
                 resetPasswordExpires: null,
             },
             {
