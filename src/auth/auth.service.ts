@@ -248,8 +248,13 @@ export class AuthService {
             expires,
         );
 
+        await this.mailService.sendResetPasswordEmail(
+            email,
+            token,
+        )
+
         return {
-            message: 'Password reset token generated', token
+            message: 'Password reset email generated'
         }
     }
 
