@@ -47,6 +47,14 @@ export class User {
     @Prop()
     emailVerificationToken?: string;
 
+    @Prop({
+        default: 0,
+    })
+    failedLoginAttempts!: number;
+
+    @Prop()
+    lockUntill?: Date;
+
 }    
 
 export const UserSchema = SchemaFactory.createForClass(User)
