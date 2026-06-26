@@ -190,7 +190,7 @@ export class UsersService {
         });
     }
 
-    async updateLoginAttemps(
+    async updateLoginAttempts(
         id: string,
         attempts: number,
         lockUntill?: Date,
