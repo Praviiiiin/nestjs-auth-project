@@ -1,8 +1,14 @@
-import {Injectable, BadRequestException} from '@nestjs/common';
-import * as crypto from 'crypto'
+import {
+    Injectable,
+    BadRequestException,
+} from '@nestjs/common';
+
+import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from 'src/users/users.service';
+
 import { JwtService } from '@nestjs/jwt';
+
+import { UsersService } from 'src/users/users.service';
 import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
@@ -10,11 +16,15 @@ export class AuthService {
     constructor(
         private userService: UsersService,
         private jwtService: JwtService,
-        private mailService: MailService
+        private mailService: MailService,
     ) {}
 
     async register(body: any) {
-        const { name, email, password } = body;
+        const {
+            name,
+            email,
+            password,
+        } = body;
 
         const existingUser =
             await this.userService.findByEmail(
@@ -28,17 +38,22 @@ export class AuthService {
         }
 
         const hashedPassword =
-            await bcrypt.hash(password, 10);
+            await bcrypt.hash(
+                password,
+                10,
+            );
 
-        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const verificationToken =
+            crypto.randomBytes(32)
+                .toString('hex');
 
-        const user =
-            await this.userService.create({
-                name,
-                email,
-                password: hashedPassword,
-                emailVerificationToken: verificationToken,
-            });
+        await this.userService.create({
+            name,
+            email,
+            password: hashedPassword,
+            emailVerificationToken:
+                verificationToken,
+        });
 
         await this.mailService.sendVerificationEmail(
             email,
@@ -47,12 +62,15 @@ export class AuthService {
 
         return {
             message:
-                'User registered successfully. Please verify your email.'            
+                'User registered successfully. Please verify your email.',
         };
     }
 
     async login(body: any) {
-        const { email, password } = body;
+        const {
+            email,
+            password,
+        } = body;
 
         const user =
             await this.userService.findByEmail(
@@ -65,11 +83,12 @@ export class AuthService {
             );
         }
 
-        if(
-            user.lockUntill && user.lockUntill > new Date()
+        if (
+            user.lockUntil &&
+            user.lockUntil > new Date()
         ) {
             throw new BadRequestException(
-                'Account is temporarily locked. Try again later.'
+                'Account is temporarily locked. Try again later.',
             );
         }
 
@@ -80,16 +99,47 @@ export class AuthService {
             );
 
         if (!isPasswordValid) {
+
+            const attempts =
+                user.failedLoginAttempts + 1;
+
+            if (attempts >= 5) {
+
+                await this.userService.updateLoginAttempts(
+                    user._id.toString(),
+                    attempts,
+                    new Date(
+                        Date.now() +
+                        15 * 60 * 1000,
+                    ),
+                );
+
+                throw new BadRequestException(
+                    'Account locked for 15 minutes.',
+                );
+            }
+
+            await this.userService.updateLoginAttempts(
+                user._id.toString(),
+                attempts,
+            );
+
             throw new BadRequestException(
                 'Invalid Credentials',
             );
         }
 
-        if(!user.isVerified) {
+        if (!user.isVerified) {
             throw new BadRequestException(
-                'Please verify your email first',
+                'Please verify your email first.',
             );
         }
+
+        await this.userService.updateLoginAttempts(
+            user._id.toString(),
+            0,
+            undefined,
+        );
 
         const payload = {
             sub: user._id,
@@ -98,7 +148,9 @@ export class AuthService {
         };
 
         const accessToken =
-            this.jwtService.sign(payload);
+            this.jwtService.sign(
+                payload,
+            );
 
         const refreshToken =
             this.jwtService.sign(
@@ -106,7 +158,6 @@ export class AuthService {
                 {
                     secret:
                         process.env.JWT_REFRESH_SECRET,
-
                     expiresIn: '7d',
                 },
             );
@@ -123,13 +174,14 @@ export class AuthService {
         );
 
         return {
-            message: 'Login Successful',
+            message:
+                'Login Successful',
             accessToken,
             refreshToken,
         };
     }
 
-    async changePassword(
+        async changePassword(
         userId: string,
         currentPassword: string,
         newPassword: string,
@@ -219,7 +271,9 @@ export class AuthService {
         };
 
         const accessToken =
-            this.jwtService.sign(payload);
+            this.jwtService.sign(
+                payload,
+            );
 
         return {
             accessToken,
@@ -230,25 +284,38 @@ export class AuthService {
         userId: string,
     ) {
         await this.userService.removeRefreshToken(
-            userId
+            userId,
         );
+
         return {
-            message: 'Logged out successfully'
+            message:
+                'Logged out successfully',
         };
     }
 
     async forgotPassword(
         email: string,
-    ) { const user = await this.userService.findByEmail(email)
+    ) {
+        const user =
+            await this.userService.findByEmail(
+                email,
+            );
 
-        if(!user) {
+        if (!user) {
             throw new BadRequestException(
-                'User not found'
+                'User not found',
             );
         }
 
-        const token = crypto.randomBytes(32).toString('hex');
-        const expires = new Date(Date.now() + 3600000 );
+        const token =
+            crypto.randomBytes(32)
+                .toString('hex');
+
+        const expires =
+            new Date(
+                Date.now() +
+                60 * 60 * 1000,
+            );
 
         await this.userService.updateResetToken(
             user._id.toString(),
@@ -259,83 +326,104 @@ export class AuthService {
         await this.mailService.sendResetPasswordEmail(
             email,
             token,
-        )
+        );
 
         return {
-            message: 'Password reset email generated'
-        }
+            message:
+                'Password reset email sent successfully.',
+        };
     }
 
     async resetPassword(
         token: string,
-        newPassword: string
+        newPassword: string,
     ) {
-        const user = await this.userService.findResetToken(
-            token,
-        );
+        const user =
+            await this.userService.findResetToken(
+                token,
+            );
 
-        if(!user) {
+        if (!user) {
             throw new BadRequestException(
                 'Invalid or expired token',
             );
         }
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword =
+            await bcrypt.hash(
+                newPassword,
+                10,
+            );
 
-        await this.userService.updatePassword(user._id.toString(), hashedPassword);
-
-        await this.userService.clearResetToken(user._id.toString())
-
-        return {
-            message: "Password reset successful"
-        }
-    }
-
-    async verifyEmail(
-        token: string,
-    ) {
-        const user = await this.userService.findByVerificationToken(
-            token,
+        await this.userService.updatePassword(
+            user._id.toString(),
+            hashedPassword,
         );
 
-        if(!user) {
+        await this.userService.clearResetToken(
+            user._id.toString(),
+        );
+
+        return {
+            message:
+                'Password reset successful',
+        };
+    }
+
+        async verifyEmail(
+        token: string,
+    ) {
+        const user =
+            await this.userService.findByVerificationToken(
+                token,
+            );
+
+        if (!user) {
             throw new BadRequestException(
-                'Invalid token'
+                'Invalid verification token',
             );
         }
 
         user.isVerified = true;
-        user.emailVerificationToken = undefined;
+
+        user.emailVerificationToken =
+            undefined;
 
         await user.save();
 
         return {
-            message: 'Email verified successfully'
+            message:
+                'Email verified successfully',
         };
     }
 
     async resendVerification(
-        email: string
+        email: string,
     ) {
-        const user = await this.userService.findByEmail(
-            email,
-        );
+        const user =
+            await this.userService.findByEmail(
+                email,
+            );
 
-        if(!user) {
+        if (!user) {
             throw new BadRequestException(
-                'User not found'
+                'User not found',
             );
         }
 
-        if(user?.isVerified) {
+        if (user.isVerified) {
             throw new BadRequestException(
-                'Email already verified'
+                'Email already verified',
             );
         }
 
-        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const verificationToken =
+            crypto.randomBytes(32)
+                .toString('hex');
 
-        user.emailVerificationToken = verificationToken;
+        user.emailVerificationToken =
+            verificationToken;
+
         await user.save();
 
         await this.mailService.sendVerificationEmail(
@@ -344,7 +432,8 @@ export class AuthService {
         );
 
         return {
-            message: 'Verification email sent successfully'
+            message:
+                'Verification email sent successfully.',
         };
     }
 }
