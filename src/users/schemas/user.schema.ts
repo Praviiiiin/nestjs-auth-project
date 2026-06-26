@@ -53,7 +53,7 @@ export class User {
     failedLoginAttempts!: number;
 
     @Prop()
-    lockUntill?: Date;
+    lockUntil?: Date;
 
 }    
 
