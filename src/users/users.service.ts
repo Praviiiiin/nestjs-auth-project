@@ -193,13 +193,13 @@ export class UsersService {
     async updateLoginAttempts(
         id: string,
         attempts: number,
-        lockUntill?: Date,
+        lockUntil?: Date,
     ) {
         return this.userModel.findByIdAndUpdate(
             id,
             {
                 failedLoginAttempts: attempts,
-                lockUntill,
+                lockUntil,
             },
             {
                 returnDocument: 'after'
