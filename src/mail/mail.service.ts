@@ -1,8 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import * as nodemailer from 'nodemailer'
 
 @Injectable()
 export class MailService {
+    private readonly logger = new Logger(
+        MailService.name
+    );
+
     private transporter = nodemailer.createTransport({
         service: 'gmail',
 
@@ -19,21 +23,33 @@ export class MailService {
     ) {
         const verificationUrl = `http://localhost:3001/auth/verify-email?token=${token}`;
         
-        await this.transporter.sendMail({
-            from: process.env.MAIL_USER,
-            to: email,
+        try {
+            await this.transporter.sendMail({
+                from: process.env.MAIL_USER,
+                to: email,
+    
+                subject: 'Verify your email',
+    
+                html: `<h2> Welcome to NestJS Auth </h2>
+                       <p> Click the link below to verify your account. </p>
+                       <a href = '${verificationUrl}'>
+                            Verify Email
+                        </a>
+                        `,
+            });
+    
+            this.logger.log(`Verification email sent to ${email}`);
+    
+        } catch (error) {
+            this.logger.error(
+                'Failed to send verification email',
+                error instanceof Error ? error.stack : String(error),
+            );
 
-            subject: 'Verify your email',
-
-            html: `<h2> Welcome to NestJS Auth </h2>
-                   <p> Click the link below to verify your account. </p>
-                   <a href = '${verificationUrl}'>
-                        Verify Email
-                    </a>
-                    `,
-        });
-
-        console.log('Verification email sent to :', email);
+            throw new Error(
+                'Unable to send verification email'
+            );
+        }    
     }
 
     async sendResetPasswordEmail(
