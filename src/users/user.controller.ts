@@ -1,4 +1,5 @@
-import { Body, Controller, Patch, UseGuards, Get, Param, Delete, Query } from "@nestjs/common";
+import { Body, Controller, Patch, UseGuards, Get, Post, Param, Delete, Query, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth-guard";
 import { CurrentUser } from "src/auth/decorators/current-user.decorator";
 import { UsersService } from "./users.service";
@@ -104,4 +105,34 @@ export class UsersController {
         return user;
     }    
 
+    @Post('upload')
+    @UseInterceptors(
+        FileInterceptor('file'),
+    )
+    uploadFile(
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+
+
+                    new MaxFileSizeValidator({
+                        maxSize: 2 * 1024 * 1024,
+                    }),
+
+                    new FileTypeValidator({
+                        fileType: /(jpg|png|jpeg)$/i,
+                    }),
+                ],
+            }),
+        )
+        file: any
+    )   {
+        return {
+            filename: file.originalname,
+
+            size: file.size,
+
+            type: file.mimetype
+        };
+    } 
 }
