@@ -10,6 +10,7 @@ import { Role } from "src/auth/enums/role.enum";
 import { UpdateRoleDto } from "src/auth/dto/update-role.dto";
 import { PaginationDto } from "src/auth/dto/pagination.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { FileNameValidator } from "src/validators/file-name.validator";
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -122,6 +123,7 @@ export class UsersController {
                     new FileTypeValidator({
                         fileType: /(jpg|png|jpeg)$/i,
                     }),
+                    new FileNameValidator()
                 ],
             }),
         )
