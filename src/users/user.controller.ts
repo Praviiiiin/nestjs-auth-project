@@ -106,6 +106,7 @@ export class UsersController {
         return user;
     }    
 
+    @UseGuards(JwtAuthGuard)
     @Post('upload')
     @UseInterceptors(
         FileInterceptor('file'),
@@ -130,6 +131,8 @@ export class UsersController {
         file: any
     )   {
         return {
+            message: 'File uploaded successfully',
+
             filename: file.originalname,
 
             size: file.size,
