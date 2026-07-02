@@ -1,9 +1,8 @@
 import {Injectable, Logger, InternalServerErrorException} from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { MailProvider } from './interface/mail-provider.interface';
 
 @Injectable()
-export class MailService implements MailProvider{
+export class MailService {
 
     private readonly logger =
         new Logger(
