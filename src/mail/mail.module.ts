@@ -1,18 +1,8 @@
 import { Module } from "@nestjs/common";
 import { MailService } from "./mail.service";
-import { MockMailService } from "./mock-mail.service";
 
 @Module({
-    providers: [
-        MailService,
-        MockMailService,
-
-        {
-            provide: 'MAIL_PROVIDER',
-            useClass: MailService
-        }
-    ],
-    
+    providers: [MailService],
     exports: [MailService],
 })
 
