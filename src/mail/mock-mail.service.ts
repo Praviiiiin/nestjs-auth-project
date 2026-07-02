@@ -17,10 +17,7 @@ export class MockMailService implements MailProvider{
         email: string, 
         token: string
     ) {
-        console.log(
-            '[MOCK] Reset Password'
-        );
-
+        console.log('[MOCK] Reset Password');
         console.log(email);
         console.log(token);
         
