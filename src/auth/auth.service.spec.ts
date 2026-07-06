@@ -17,11 +17,26 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
+      
       providers: [
         AuthService,
+
+        {
+          provide: UsersService,
+          useValue: {},
+        },
+        {
+          provide: JwtService,
+          useValue: {},
+        },
+        {
+          provide: 'MAIL_PROVIDER',
+          useValue: {}
+        }
       ],
     }).compile();
 
-    
+    authService = module.get(AuthService);
+       
   })
 })
