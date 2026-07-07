@@ -16,14 +16,23 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
-
   afterEach(async () => {
     await app.close();
   });
+
+  it(
+    'should register a new user',
+    async () => {
+      await request(
+        app.getHttpServer(),
+      )
+        .post('/auth/register')
+        .send({
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'Password@123'
+        })
+        .expect(201);
+    }
+  );
 });
