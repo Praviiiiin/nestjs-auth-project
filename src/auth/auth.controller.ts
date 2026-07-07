@@ -7,10 +7,11 @@ import { CurrentUser } from './decorators/current-user.decorator'
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ForgotPasswordDto } from './dto/forgot-passsword.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
-
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
+import { UserDocument } from 'src/users/schemas/user.schema';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -19,16 +20,28 @@ import { ResendVerificationDto } from './dto/resend-verification.dto';
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    @Throttle({
+        default: {
+            limit: 3,
+            ttl: 60000,
+        }
+    })
     @Post('register')
     register(@Body() body: RegisterDto) {
         return this.authService.register(body);
     }
 
+    @Throttle({
+        default: {
+            limit: 5, 
+            ttl: 60000,
+        },
+    })
     @Post('login')
     login(@Body() body: LoginDto) {
         return this.authService.login(body);
     }
-
+    @SkipThrottle()
     @Post('refresh')
     refresh(
         @Body()
@@ -70,6 +83,12 @@ export class AuthController {
         );
     }
 
+    @Throttle({
+        default: {
+            limit: 3, 
+            ttl: 60000,
+        },
+    })
     @Post('forgot-password')
     forgotPassword(
         @Body()
@@ -80,6 +99,12 @@ export class AuthController {
         );
     }
 
+    @Throttle({
+        default: {
+            limit: 5, 
+            ttl: 60000,
+        },
+    })
     @Post('reset-password')
     resetPassword(
         @Body()
@@ -91,6 +116,12 @@ export class AuthController {
         );
     }
 
+    @Throttle({
+        default: {
+            limit: 5, 
+            ttl: 60000,
+        },
+    })
     @Get('verify-email')
     verifyEmail(
         @Query('token')
@@ -101,6 +132,12 @@ export class AuthController {
         );
     }
 
+    @Throttle({
+        default: {
+            limit: 3, 
+            ttl: 60000,
+        },
+    })
     @Post('resend-verification')
     resendVerification(
         @Body()
