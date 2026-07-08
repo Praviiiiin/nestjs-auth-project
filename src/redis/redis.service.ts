@@ -33,4 +33,25 @@ export class RedisService {
             this.logger.error(error.message)
         })
     }
+
+    async set(
+        key: string,
+        value: unknown,
+        ttl?: number,
+    ) {
+        if(ttl) {
+            await this.redis.set(
+                key,
+                JSON.stringify(value),
+                'PX',
+                ttl,
+            );
+
+            return;
+        }
+        await this.redis.set(
+            key,
+            JSON.stringify(value)
+        );
+    }
 }
