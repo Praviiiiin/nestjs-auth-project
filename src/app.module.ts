@@ -22,7 +22,7 @@ import { APP_GUARD } from '@nestjs/core';
     
     MongooseModule.forRoot(process.env.MONGODB_URI!),
     UsersModule,
-    AuthModule
+    AuthModule,
   ],
 
   providers: [{
