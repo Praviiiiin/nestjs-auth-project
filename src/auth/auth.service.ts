@@ -90,6 +90,8 @@ export class AuthService {
             );
         }
 
+        this.logger.log(`User${user.email} logged in successfully`)
+
         const isPasswordValid =
             await bcrypt.compare(
                 password,
@@ -122,9 +124,7 @@ export class AuthService {
                 attempts,
             );
 
-            throw new BadRequestException(
-                'Invalid Credentials',
-            );
+            this.logger.warn(`Invalid login attempt for ${email}`)
         }
 
         if (!user.isVerified) {
