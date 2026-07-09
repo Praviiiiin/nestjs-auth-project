@@ -28,7 +28,20 @@ export class UsersService {
         if(cachedUser) {
             return cachedUser
         }
-        return this.userModel.findById(id);
+
+        const user = await this.userModel.findById(id);
+
+        if(!user) {
+            return null;
+        }
+
+        await this.redisService.set(
+            cacheKey,
+            user,
+            60000,
+        );
+
+        return user;
     }
 
     async updateUser(
