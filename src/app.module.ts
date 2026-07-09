@@ -3,32 +3,20 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 5,
-      }
-    ]),
-
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'src/.env',
     }),
     
     MongooseModule.forRoot(process.env.MONGODB_URI!),
-    UsersModule,
     AuthModule,
+    UsersModule,
+    RedisModule,
   ],
-
-  providers: [{
-    provide: APP_GUARD,
-    useClass: ThrottlerGuard,
-  }]
   
 }) 
 export class AppModule {}
