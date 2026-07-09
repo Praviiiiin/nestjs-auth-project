@@ -66,4 +66,18 @@ export class RedisService {
 
         return JSON.parse(value) as T;
     }
+
+    async del(
+        key: string
+    ) {
+        await this.redis.del(key)
+    }
+
+    async exists(
+        key: string,
+    ): Promise<boolean> {
+        return (
+            await this.redis.exists(key)
+        ) === 1
+    }
 }
