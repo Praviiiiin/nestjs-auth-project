@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema'
 import { Role } from 'src/auth/enums/role.enum';
 import { RedisService } from 'src/redis/redis.service';
+import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -46,15 +47,18 @@ export class UsersService {
 
     async updateUser(
         id: string,
-        updateData: any,
+        updateData: UpdateUserDto,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = this.userModel.findByIdAndUpdate(
             id,
             updateData,
             {
                 returnDocument: "after",
             },
         );
+
+        await this.redisService.del(`user${id}`)
+        return user;
     }
 
     async updatePassword(
