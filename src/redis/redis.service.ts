@@ -54,4 +54,16 @@ export class RedisService {
             JSON.stringify(value)
         );
     }
+
+    async get<T>(
+        key: string,
+    ): Promise<T | null> {
+        const value = await this.redis.get(key);
+
+        if(!value) {
+            return null;
+        }
+
+        return JSON.parse(value) as T;
+    }
 }
