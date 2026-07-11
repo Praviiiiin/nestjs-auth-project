@@ -24,7 +24,7 @@ export class UsersService {
     async findById(id: string) {
 
         const cacheKey = `user:${id}`;
-        const cachedUser = await this.redisService.get<User>(cacheKey);
+        const cachedUser = await this.redisService.get<UserDocument>(cacheKey);
 
         if(cachedUser) {
             return cachedUser
@@ -49,7 +49,7 @@ export class UsersService {
         id: string,
         updateData: UpdateUserDto,
     ) {
-        const user = this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             updateData,
             {
@@ -57,7 +57,7 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(`user${id}`)
+        await this.redisService.del(`user:${id}`)
         return user;
     }
 
