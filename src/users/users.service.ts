@@ -23,11 +23,12 @@ export class UsersService {
 
     async findById(id: string) {
 
+        type CachedUser = Omit<User, never> & { _id: string };
         const cacheKey = `user:${id}`;
-        const cachedUser = await this.redisService.get<UserDocument>(cacheKey);
+        const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
 
         if(cachedUser) {
-            return cachedUser
+            return this.userModel.hydrate(cachedUser)
         }
 
         const user = await this.userModel.findById(id);
