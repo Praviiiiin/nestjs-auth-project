@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RolesGuard } from './guards/roles.guard';
 import { MailModule } from 'src/mail/mail.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -17,7 +18,6 @@ import { MailModule } from 'src/mail/mail.module';
   
     JwtModule.registerAsync({
       imports: [ConfigModule],
-
       inject: [ConfigService],
 
       useFactory: (configService: ConfigService) => ({
@@ -27,6 +27,10 @@ import { MailModule } from 'src/mail/mail.module';
       },
     }),
   }),
+
+  BullModule.registerQueue({
+      name: 'mail',
+    }),
 ],
 
   controllers: [AuthController],
