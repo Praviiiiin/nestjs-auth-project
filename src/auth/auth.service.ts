@@ -6,6 +6,8 @@ import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import type { MailProvider } from 'src/mail/interface/mail-provider.interface';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,9 @@ export class AuthService {
 
         @Inject('MAIL_PROVIDER')
         private mailService: MailProvider,
+
+        @InjectQueue('mail')
+        private readonly mailQueue: Queue
     ) {}
 
     async register(body: RegisterDto) {
@@ -53,9 +58,11 @@ export class AuthService {
                 verificationToken,
         });
 
-        await this.mailService.sendVerificationEmail(
-            email,
-            verificationToken,
+        await this.mailQueue.add('send-verification-email',
+            {
+                email,
+                verificationToken
+            }
         );
 
         return {
@@ -90,8 +97,6 @@ export class AuthService {
             );
         }
 
-        this.logger.log(`User${user.email} logged in successfully`)
-
         const isPasswordValid =
             await bcrypt.compare(
                 password,
@@ -124,7 +129,8 @@ export class AuthService {
                 attempts,
             );
 
-            this.logger.warn(`Invalid login attempt for ${email}`)
+            this.logger.warn(`Invalid login attempt for ${email}`);
+            throw new BadRequestException('Invalid Credentials')
         }
 
         if (!user.isVerified) {
@@ -263,7 +269,7 @@ export class AuthService {
         }
 
         const payload = {
-            sub: user._id,
+            sub: user._id.toString(),
             email: user.email,
             role: user.role,
         };
