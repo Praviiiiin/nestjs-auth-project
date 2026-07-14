@@ -7,7 +7,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import type { MailProvider } from 'src/mail/interface/mail-provider.interface';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { delay, Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
@@ -62,7 +62,18 @@ export class AuthService {
             {
                 email,
                 verificationToken
-            }
+            },
+            {
+                attempts: 3,
+
+                backoff: {
+                    type: 'exponential',
+                    delay: 5000,
+                },
+                removeOnComplete: true,
+
+                removeOnFail: false
+            },
         );
 
         return {
