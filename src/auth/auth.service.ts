@@ -338,9 +338,21 @@ export class AuthService {
             expires,
         );
 
-        await this.mailService.sendResetPasswordEmail(
-            email,
-            token,
+        await this.mailQueue.add(
+            'send-reset-password-email',
+            {
+                email,
+                token,
+            },
+            {
+                attempts: 3,
+                backoff: {
+                    type: 'exponential',
+                    delay: 5000,
+                },
+                removeOnComplete: true,
+                removeOnFail: false
+            },
         );
 
         return {
@@ -441,9 +453,22 @@ export class AuthService {
 
         await user.save();
 
-        await this.mailService.sendVerificationEmail(
-            email,
-            verificationToken,
+        await this.mailQueue.add(
+            'send-verification-email',
+            {
+                email,
+                verificationToken,
+            },
+            {
+                attempts: 3,
+                backoff: {
+                    type: 'exponential',
+                    delay: 5000,
+                },
+
+                removeOnComplete: true,
+                removeOnFail: false,
+            }
         );
 
         return {
