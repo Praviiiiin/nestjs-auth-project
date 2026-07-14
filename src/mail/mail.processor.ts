@@ -22,6 +22,21 @@ export class MailProcessor extends WorkerHost {
                 );
 
                 break;
+
+            case 'send-reset-password-email':
+
+                await this.mailService.sendResetPasswordEmail(
+                    job.data.email,
+                    job.data.token,
+                );
+
+                break;
+
+            default:
+
+                throw new Error(
+                    `Unknown job: ${job.name}`,
+                );
         }
     }
 }
