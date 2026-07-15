@@ -1,11 +1,17 @@
-import { Processor, WorkerHost } from "@nestjs/bullmq";
+import { Processor, WorkerHost, OnWorkerEvent } from "@nestjs/bullmq";
 import { Job } from "bullmq";
 import { MailService } from "./mail.service";
+import { Logger } from "@nestjs/common";
 
 @Processor('mail')
 export class MailProcessor extends WorkerHost {
+
+    private readonly logger = new Logger(
+            MailProcessor.name,
+    );
+
     constructor(
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
     ) {
         super()
     }
@@ -38,5 +44,31 @@ export class MailProcessor extends WorkerHost {
                     `Unknown job: ${job.name}`,
                 );
         }
+    }
+
+    @OnWorkerEvent('completed')
+    onCompleted(job: Job) {
+        this.logger.log(
+            `Job ${job.name} completed`,
+        )
+    }
+
+    @OnWorkerEvent('failed')
+    onFailed(
+        job: Job,
+        error: Error,
+    ) {
+        this.logger.log(
+            `Job ${job?.name} failed`,
+            error.stack,
+        )
+    }
+
+    @OnWorkerEvent('active')
+    onActive(job: Job) {
+        this.logger.log(
+            `Processing ${job.name}`
+        );
+        
     }
 }
