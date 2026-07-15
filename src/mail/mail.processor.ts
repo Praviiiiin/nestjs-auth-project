@@ -2,6 +2,7 @@ import { Processor, WorkerHost, OnWorkerEvent } from "@nestjs/bullmq";
 import { Job } from "bullmq";
 import { MailService } from "./mail.service";
 import { Logger } from "@nestjs/common";
+import { MailJob } from "./interface/mail-job.interface";
 
 @Processor('mail')
 export class MailProcessor extends WorkerHost {
@@ -16,7 +17,7 @@ export class MailProcessor extends WorkerHost {
         super()
     }
 
-    async process(job: Job){
+    async process(job: Job<MailJob>){
 
         switch(job.name) {
 
@@ -24,7 +25,7 @@ export class MailProcessor extends WorkerHost {
 
                 await this.mailService.sendVerificationEmail(
                     job.data.email,
-                    job.data.token,
+                    job.data.verificationToken,
                 );
 
                 break;
@@ -33,7 +34,7 @@ export class MailProcessor extends WorkerHost {
 
                 await this.mailService.sendResetPasswordEmail(
                     job.data.email,
-                    job.data.token,
+                    job.data.verificationToken,
                 );
 
                 break;
