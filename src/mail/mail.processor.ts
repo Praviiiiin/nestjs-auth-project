@@ -2,7 +2,8 @@ import { Processor, WorkerHost, OnWorkerEvent } from "@nestjs/bullmq";
 import { Job } from "bullmq";
 import { MailService } from "./mail.service";
 import { Logger } from "@nestjs/common";
-import { MailJob } from "./interface/mail-job.interface";
+import { VerificationMailJob } from "./interface/verification-mail-job.interface";
+import { ResetPasswordMailJob } from "./interface/reset-password-mail-job.interface";
 
 @Processor('mail')
 export class MailProcessor extends WorkerHost {
@@ -17,11 +18,12 @@ export class MailProcessor extends WorkerHost {
         super()
     }
 
-    async process(job: Job<MailJob>){
+    async process(job: Job){
 
         switch(job.name) {
 
-            case 'send-verification-email':
+            case 'send-verification-email': {
+                const data = job.data as ResetPasswordMailJob
 
                 await this.mailService.sendVerificationEmail(
                     job.data.email,
@@ -29,16 +31,19 @@ export class MailProcessor extends WorkerHost {
                 );
 
                 break;
+            }
 
-            case 'send-reset-password-email':
+            case 'send-reset-password-email': {
+                const data = job.data as ResetPasswordMailJob
+            
 
                 await this.mailService.sendResetPasswordEmail(
                     job.data.email,
-                    job.data.verificationToken,
+                    job.data.resetPasswordToken,
                 );
 
                 break;
-
+            }    
             default:
 
                 throw new Error(
