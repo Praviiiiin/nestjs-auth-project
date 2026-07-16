@@ -7,7 +7,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import type { MailProvider } from 'src/mail/interface/mail-provider.interface';
 import { InjectQueue } from '@nestjs/bullmq';
-import { delay, Queue } from 'bullmq';
+import {  Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
@@ -55,24 +55,13 @@ export class AuthService {
             email,
             password: hashedPassword,
             emailVerificationToken:
-                verificationToken,
+            verificationToken,
         });
 
         await this.mailQueue.add('send-verification-email',
             {
                 email,
-                verificationToken
-            },
-            {
-                attempts: 3,
-
-                backoff: {
-                    type: 'exponential',
-                    delay: 5000,
-                },
-                removeOnComplete: true,
-
-                removeOnFail: false
+                token: verificationToken,
             },
         );
 
@@ -342,16 +331,7 @@ export class AuthService {
             'send-reset-password-email',
             {
                 email,
-                token,
-            },
-            {
-                attempts: 3,
-                backoff: {
-                    type: 'exponential',
-                    delay: 5000,
-                },
-                removeOnComplete: true,
-                removeOnFail: false
+                resetPasswordToken: token,
             },
         );
 
@@ -457,18 +437,8 @@ export class AuthService {
             'send-verification-email',
             {
                 email,
-                verificationToken,
+                token: verificationToken,
             },
-            {
-                attempts: 3,
-                backoff: {
-                    type: 'exponential',
-                    delay: 5000,
-                },
-
-                removeOnComplete: true,
-                removeOnFail: false,
-            }
         );
 
         return {
