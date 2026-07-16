@@ -46,6 +46,10 @@ export class MailProcessor extends WorkerHost {
             }    
             default:
 
+                this.logger.error(
+                    `Unknown job recieved: ${job.name}`,
+                );
+
                 throw new Error(
                     `Unknown job: ${job.name}`,
                 );
@@ -55,7 +59,7 @@ export class MailProcessor extends WorkerHost {
     @OnWorkerEvent('completed')
     onCompleted(job: Job) {
         this.logger.log(
-            `Job ${job.name} completed`,
+            `Job "${job.name}" completed successfully (ID: ${job.id})`,
         )
     }
 
@@ -65,7 +69,7 @@ export class MailProcessor extends WorkerHost {
         error: Error,
     ) {
         this.logger.log(
-            `Job ${job?.name} failed`,
+            `Job "${job?.name}" failed (ID: ${job?.id})`,
             error.stack,
         )
     }
@@ -73,7 +77,7 @@ export class MailProcessor extends WorkerHost {
     @OnWorkerEvent('active')
     onActive(job: Job) {
         this.logger.log(
-            `Processing ${job.name}`
+            `Processing job "${job.name}" (ID: ${job.id})`,
         );
         
     }
