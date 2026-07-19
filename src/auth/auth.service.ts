@@ -9,6 +9,7 @@ import type { MailProvider } from 'src/mail/interface/mail-provider.interface';
 import { InjectQueue } from '@nestjs/bullmq';
 import {  Queue } from 'bullmq';
 import { QUEUES } from 'src/mail/constants/queue.constants';
+import { MAIL_JOBS } from 'src/mail/constants/job.constants';
 
 @Injectable()
 export class AuthService {
@@ -329,7 +330,7 @@ export class AuthService {
         );
 
         await this.mailQueue.add(
-            'send-reset-password-email',
+            MAIL_JOBS.SEND_RESET_PASSWORD,
             {
                 email,
                 resetPasswordToken: token,
@@ -435,7 +436,7 @@ export class AuthService {
         await user.save();
 
         await this.mailQueue.add(
-            'send-verification-email',
+            MAIL_JOBS.SEND_VERIFICATION,
             {
                 email,
                 token: verificationToken,
