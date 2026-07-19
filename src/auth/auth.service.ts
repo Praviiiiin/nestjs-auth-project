@@ -8,6 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import type { MailProvider } from 'src/mail/interface/mail-provider.interface';
 import { InjectQueue } from '@nestjs/bullmq';
 import {  Queue } from 'bullmq';
+import { QUEUES } from 'src/mail/constants/queue.constants';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
         @Inject('MAIL_PROVIDER')
         private mailService: MailProvider,
 
-        @InjectQueue('mail')
+        @InjectQueue(QUEUES.MAIL)
         private readonly mailQueue: Queue
     ) {}
 
