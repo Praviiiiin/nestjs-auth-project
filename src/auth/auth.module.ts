@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RolesGuard } from './guards/roles.guard';
 import { MailModule } from 'src/mail/mail.module';
 import { BullModule } from '@nestjs/bullmq';
+import { QUEUES } from 'src/mail/constants/queue.constants';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { BullModule } from '@nestjs/bullmq';
   }),
 
   BullModule.registerQueue({
-      name: 'mail',
+      name: QUEUES.MAIL,
     }),
 ],
 
