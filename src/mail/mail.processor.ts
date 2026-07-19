@@ -5,6 +5,7 @@ import { Logger } from "@nestjs/common";
 import { VerificationMailJob } from "./interface/verification-mail-job.interface";
 import { ResetPasswordMailJob } from "./interface/reset-password-mail-job.interface";
 import { QUEUES } from "./constants/queue.constants";
+import { MAIL_JOBS } from "./constants/job.constants";
 
 @Processor(QUEUES.MAIL)
 export class MailProcessor extends WorkerHost {
@@ -23,7 +24,7 @@ export class MailProcessor extends WorkerHost {
 
         switch(job.name) {
 
-            case 'send-verification-email': {
+            case MAIL_JOBS.SEND_VERIFICATION: {
                 const data = job.data as VerificationMailJob;
 
                 await this.mailService.sendVerificationEmail(
@@ -34,7 +35,7 @@ export class MailProcessor extends WorkerHost {
                 break;
             }
 
-            case 'send-reset-password-email': {
+            case MAIL_JOBS.SEND_RESET_PASSWORD: {
                 const data = job.data as ResetPasswordMailJob
             
 
