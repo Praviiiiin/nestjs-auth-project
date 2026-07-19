@@ -2,12 +2,13 @@ import { Module } from "@nestjs/common";
 import { MailService } from "./mail.service";
 import { BullModule } from "@nestjs/bullmq";
 import { MailProcessor } from "./mail.processor";
+import { QUEUES } from "./constants/queue.constants";
 
 @Module({
     imports: [
 
         BullModule.registerQueue({
-            name: 'mail',
+            name: QUEUES.MAIL,
 
             defaultJobOptions: {
 
