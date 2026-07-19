@@ -4,8 +4,9 @@ import { MailService } from "./mail.service";
 import { Logger } from "@nestjs/common";
 import { VerificationMailJob } from "./interface/verification-mail-job.interface";
 import { ResetPasswordMailJob } from "./interface/reset-password-mail-job.interface";
+import { QUEUES } from "./constants/queue.constants";
 
-@Processor('mail')
+@Processor(QUEUES.MAIL)
 export class MailProcessor extends WorkerHost {
 
     private readonly logger = new Logger(
