@@ -23,7 +23,7 @@ export class MailProcessor extends WorkerHost {
         switch(job.name) {
 
             case 'send-verification-email': {
-                const data = job.data as VerificationMailJob
+                const data = job.data as VerificationMailJob;
 
                 await this.mailService.sendVerificationEmail(
                     job.data.email,
