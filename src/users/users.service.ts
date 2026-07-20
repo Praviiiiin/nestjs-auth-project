@@ -5,6 +5,7 @@ import { User, UserDocument } from './schemas/user.schema'
 import { Role } from 'src/auth/enums/role.enum';
 import { RedisService } from 'src/redis/redis.service';
 import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
+import { CACHE_KEYS } from 'src/mail/constants/cache.constants';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +25,7 @@ export class UsersService {
     async findById(id: string) {
 
         type CachedUser = Omit<User, never> & { _id: string };
-        const cacheKey = `user:${id}`;
+        const cacheKey = `${CACHE_KEYS.USER}`;
         const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
 
         if(cachedUser) {
@@ -58,7 +59,7 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(`user:${id}`)
+        await this.redisService.del(`${CACHE_KEYS.USER}`)
         return user;
     }
 
