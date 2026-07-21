@@ -5,7 +5,7 @@ import { User, UserDocument } from './schemas/user.schema'
 import { Role } from 'src/auth/enums/role.enum';
 import { RedisService } from 'src/redis/redis.service';
 import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
-import { CACHE_KEYS } from 'src/mail/constants/cache.constants';
+import { CACHE_KEYS, CACHE } from 'src/mail/constants/cache.constants';
 
 @Injectable()
 export class UsersService {
@@ -41,7 +41,7 @@ export class UsersService {
         await this.redisService.set(
             cacheKey,
             user,
-            60000,
+            CACHE.USER_TTL,
         );
 
         return user;
@@ -219,7 +219,7 @@ export class UsersService {
 
     async updateLoginAttempts(
         id: string,
-        attempts: number,
+        attempts: 3,
         lockUntil?: Date,
     ) {
         return this.userModel.findByIdAndUpdate(
