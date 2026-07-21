@@ -8,8 +8,9 @@ import { LoginDto } from './dto/login.dto';
 import type { MailProvider } from 'src/mail/interface/mail-provider.interface';
 import { InjectQueue } from '@nestjs/bullmq';
 import {  Queue } from 'bullmq';
-import { QUEUES } from 'src/mail/constants/queue.constants';
+import { QUEUE_OPTIONS, QUEUES } from 'src/mail/constants/queue.constants';
 import { MAIL_JOBS } from 'src/mail/constants/job.constants';
+import { SECURITY } from 'src/mail/constants/security.constants';
 
 @Injectable()
 export class AuthService {
@@ -60,7 +61,7 @@ export class AuthService {
             verificationToken,
         });
 
-        await this.mailQueue.add('send-verification-email',
+        await this.mailQueue.add(MAIL_JOBS.SEND_VERIFICATION,
             {
                 email,
                 token: verificationToken,
@@ -114,10 +115,10 @@ export class AuthService {
 
                 await this.userService.updateLoginAttempts(
                     user._id.toString(),
-                    attempts,
+                    QUEUE_OPTIONS.ATTEMPTS,
                     new Date(
                         Date.now() +
-                        15 * 60 * 1000,
+                        SECURITY.ACCOUNT_LOCK_MINUTES,
                     ),
                 );
 
@@ -128,7 +129,7 @@ export class AuthService {
 
             await this.userService.updateLoginAttempts(
                 user._id.toString(),
-                attempts,
+                QUEUE_OPTIONS.ATTEMPTS,
             );
 
             this.logger.warn(`Invalid login attempt for ${email}`);
@@ -143,7 +144,7 @@ export class AuthService {
 
         await this.userService.updateLoginAttempts(
             user._id.toString(),
-            0,
+            3,
             undefined,
         );
 
@@ -320,7 +321,7 @@ export class AuthService {
         const expires =
             new Date(
                 Date.now() +
-                60 * 60 * 1000,
+                SECURITY.ACCOUNT_LOCK_MINUTES,
             );
 
         await this.userService.updateResetToken(
