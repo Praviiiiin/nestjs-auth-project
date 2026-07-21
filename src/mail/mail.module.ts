@@ -3,6 +3,7 @@ import { MailService } from "./mail.service";
 import { BullModule } from "@nestjs/bullmq";
 import { MailProcessor } from "./mail.processor";
 import { QUEUES } from "./constants/queue.constants";
+import { QUEUE_OPTIONS } from "./constants/queue.constants";
 
 @Module({
     imports: [
@@ -12,16 +13,16 @@ import { QUEUES } from "./constants/queue.constants";
 
             defaultJobOptions: {
 
-            attempts: 3,
+            attempts: QUEUE_OPTIONS.ATTEMPTS,
 
             backoff: {
                 type: 'exponential',
-                delay: 5000,
+                delay: QUEUE_OPTIONS.BACKOFF_DELAY,
             },
 
-            removeOnComplete: true,
+            removeOnComplete: QUEUE_OPTIONS.REMOVE_ON_COMPLETE,
 
-            removeOnFail: false,
+            removeOnFail: QUEUE_OPTIONS.REMOVE_ON_FAIL,
         },
         }),
     ],
