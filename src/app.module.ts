@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { BullModule } from '@nestjs/bullmq'
 import { BullBoardModule } from './bull-board/bull-board.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -24,6 +25,15 @@ import { BullBoardModule } from './bull-board/bull-board.module';
         ),
         password: process.env.REDIS_PASSWORD || undefined,
       },
+    }),
+
+    ThrottlerModule.forRoot({
+      throttlers: [
+        { 
+          ttl: 60000,
+          limit: 20,
+        },
+      ],
     }),
     
     AuthModule,
