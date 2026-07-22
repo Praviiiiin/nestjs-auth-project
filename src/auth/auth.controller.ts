@@ -11,7 +11,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
-import { UserDocument } from 'src/users/schemas/user.schema';
+import { THROTTLER } from 'src/mail/constants/throttler.constants';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -22,8 +22,8 @@ export class AuthController {
 
     @Throttle({
         default: {
-            limit: 3,
-            ttl: 60000,
+            limit: THROTTLER.REGISTER.LIMIT,
+            ttl: THROTTLER.REGISTER.TTL,
         }
     })
     @Post('register')
@@ -33,14 +33,15 @@ export class AuthController {
 
     @Throttle({
         default: {
-            limit: 5, 
-            ttl: 60000,
+            limit: THROTTLER.LOGIN.LIMIT, 
+            ttl: THROTTLER.LOGIN.TTL,
         },
     })
     @Post('login')
     login(@Body() body: LoginDto) {
         return this.authService.login(body);
     }
+
     @SkipThrottle()
     @Post('refresh')
     refresh(
@@ -85,8 +86,8 @@ export class AuthController {
 
     @Throttle({
         default: {
-            limit: 3, 
-            ttl: 60000,
+            limit: THROTTLER.FORGOT_PASSWORD.LIMIT, 
+            ttl: THROTTLER.FORGOT_PASSWORD.TTL,
         },
     })
     @Post('forgot-password')
@@ -101,8 +102,8 @@ export class AuthController {
 
     @Throttle({
         default: {
-            limit: 5, 
-            ttl: 60000,
+            limit: THROTTLER.RESET_PASSWORD.LIMIT, 
+            ttl: THROTTLER.RESET_PASSWORD.TTL,
         },
     })
     @Post('reset-password')
@@ -116,12 +117,6 @@ export class AuthController {
         );
     }
 
-    @Throttle({
-        default: {
-            limit: 5, 
-            ttl: 60000,
-        },
-    })
     @Get('verify-email')
     verifyEmail(
         @Query('token')
@@ -134,8 +129,8 @@ export class AuthController {
 
     @Throttle({
         default: {
-            limit: 3, 
-            ttl: 60000,
+            limit: THROTTLER.RESEND_VERIFICATION.LIMIT, 
+            ttl: THROTTLER.RESEND_VERIFICATION.TTL,
         },
     })
     @Post('resend-verification')
