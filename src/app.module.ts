@@ -6,7 +6,10 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { BullModule } from '@nestjs/bullmq'
 import { BullBoardModule } from './bull-board/bull-board.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { THROTTLER } from './mail/constants/throttler.constants';
+import { APP_GUARD } from '@nestjs/core';
+
 
 @Module({
   imports: [
@@ -30,18 +33,24 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ThrottlerModule.forRoot({
       throttlers: [
         { 
-          ttl: 60000,
-          limit: 20,
+          ttl: THROTTLER.GLOBAL.TTL,
+          limit: THROTTLER.GLOBAL.LIMIT,
         },
       ],
     }),
-    
+
     AuthModule,
     UsersModule,
     RedisModule,
     BullBoardModule,
   ],
   
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 }) 
 export class AppModule {}
 
