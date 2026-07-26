@@ -241,5 +241,24 @@ export class UsersService {
             googleId,
         });
     }
+
+    async updateGoogleAccount(
+        id: string,
+        googleId: string,
+        avatar?: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                googleId,
+                avatar,
+                provider: 'google',
+                isVerified: true,
+            },
+            {
+                new: true,
+            },
+        );
+    }
 }
 
