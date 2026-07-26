@@ -233,5 +233,13 @@ export class UsersService {
             },
         );
     }
+
+    async findByGoogleId(
+        googleId: string
+    ){
+        return this.userModel.findOne({
+            googleId,
+        });
+    }
 }
 
