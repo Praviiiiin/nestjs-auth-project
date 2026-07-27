@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, UseGuards, Patch, Query  } from '@nestjs/common';
+import { Controller, Body, Post, Get, UseGuards, Patch, Query, Req  } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth-guard';
 import { RegisterDto } from './dto/register.dto';
@@ -12,6 +12,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { THROTTLER } from 'src/mail/constants/throttler.constants';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -141,6 +142,12 @@ export class AuthController {
         return this.authService.resendVerification(
             dto.email
         )
+    }
+
+    @Get('google')
+    @UseGuards(GoogleAuthGuard)
+    googleLogin() {
+        
     }
 
 }
