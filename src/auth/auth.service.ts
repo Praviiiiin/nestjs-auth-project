@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Inject, Logger } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, Logger, UnauthorizedException } from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -98,6 +98,12 @@ export class AuthService {
         ) {
             throw new BadRequestException(
                 'Account is temporarily locked. Try again later.',
+            );
+        }
+
+        if(!user.password) {
+            throw new UnauthorizedException(
+                'This account uses Google Sign-In. Please continue with Google',
             );
         }
 
@@ -205,6 +211,12 @@ export class AuthService {
             );
         }
 
+        if(!user.password) {
+            throw new UnauthorizedException(
+                'This account uses Google Sign-In. Please continue with Google',
+            );
+        }    
+        
         const isPasswordValid =
             await bcrypt.compare(
                 currentPassword,
@@ -473,6 +485,22 @@ export class AuthService {
                 dto.avatar,
             );
         }
+
+        const user = await this.userService.create({
+
+            name: dto.name,
+
+            email: dto.email,
+
+            googleId: dto.googleId,
+
+            avatar: dto.avatar,
+
+            provider: 'google',
+
+            isVerified: true,
+        });
+        return user;
     }
 
     private readonly logger = new Logger(AuthService.name);
