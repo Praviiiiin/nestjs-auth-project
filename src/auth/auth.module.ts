@@ -10,6 +10,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { MailModule } from 'src/mail/mail.module';
 import { BullModule } from '@nestjs/bullmq';
 import { QUEUES } from 'src/mail/constants/queue.constants';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { QUEUES } from 'src/mail/constants/queue.constants';
 ],
 
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, GoogleStrategy],
   exports:[AuthService]
 })
 
