@@ -20,10 +20,22 @@ export class User {
     })
     email! :string;
 
+    @Prop()
+    googleId?: string;
+
+    @Prop()
+    avatar?: string;
+
+    @Prop({
+        enum: ['local', 'google', 'github'],
+        default: 'local',
+    })
+    provider!: 'local' | 'google' | 'github';
+
     @Prop({
         required:true
     })
-    password! :string
+    password?: string
 
     @Prop()
     refreshToken?: string;
