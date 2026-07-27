@@ -11,6 +11,7 @@ import {  Queue } from 'bullmq';
 import { QUEUE_OPTIONS, QUEUES } from 'src/mail/constants/queue.constants';
 import { MAIL_JOBS } from 'src/mail/constants/job.constants';
 import { SECURITY } from 'src/mail/constants/security.constants';
+import { GoogleUserDto } from './dto/google-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -448,6 +449,18 @@ export class AuthService {
             message:
                 'Verification email sent successfully.',
         };
+    }
+    
+    async validateGoogleUser(
+        dto: GoogleUserDto
+    ) {
+        const existingGoogleUser = await this.userService.findByGoogleId(
+            dto.googleId,
+        );
+
+        if(existingGoogleUser) {
+            return existingGoogleUser;
+        }
     }
 
     private readonly logger = new Logger(AuthService.name);
