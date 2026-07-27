@@ -461,6 +461,18 @@ export class AuthService {
         if(existingGoogleUser) {
             return existingGoogleUser;
         }
+
+        const existingUser = await this.userService.findByEmail(
+            dto.email,
+        )
+
+        if(existingUser) {
+            return await this.userService.updateGoogleAccount(
+                existingUser._id.toString(),
+                dto.googleId,
+                dto.avatar,
+            );
+        }
     }
 
     private readonly logger = new Logger(AuthService.name);
