@@ -156,46 +156,10 @@ export class AuthService {
             undefined,
         );
 
-        const payload = {
-            sub: user._id.toString(),
-            email: user.email,
-            role: user.role,
-        };
-
-        const accessToken =
-            this.jwtService.sign(
-                payload,
-            );
-
-        const refreshToken =
-            this.jwtService.sign(
-                payload,
-                {
-                    secret:
-                        process.env.JWT_REFRESH_SECRET,
-                    expiresIn: '7d',
-                },
-            );
-
-        const hashedRefreshToken =
-            await bcrypt.hash(
-                refreshToken,
-                10,
-            );
-
-        await this.userService.updateRefreshToken(
-            user._id.toString(),
-            hashedRefreshToken,
+        return await this.generateAuthResponse(
+            user,
         );
-
-        return {
-            message:
-                'Login Successful',
-            accessToken,
-            refreshToken,
-        };
-    }
-
+    }    
         async changePassword(
         userId: string,
         currentPassword: string,
