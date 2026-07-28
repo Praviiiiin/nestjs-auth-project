@@ -503,5 +503,48 @@ export class AuthService {
         return user;
     }
 
+    private async generateAuthResponse(
+        user: any,
+    ) {
+        const payload = {
+            sub: user._id.toString(),
+            email: user.email,
+            role: user.role,
+        };
+
+        const accessToken =
+            this.jwtService.sign(
+                payload,
+            );
+
+        const refreshToken =
+            this.jwtService.sign(
+                payload,
+                {
+                    secret:
+                        process.env.JWT_REFRESH_SECRET,
+                    expiresIn: '7d',
+                },
+            );
+
+        const hashedRefreshToken =
+            await bcrypt.hash(
+                refreshToken,
+                10,
+            );
+
+        await this.userService.updateRefreshToken(
+            user._id.toString(),
+            hashedRefreshToken,
+        );
+
+        return {
+            message:
+                'Login Successful',
+            accessToken,
+            refreshToken,
+        };
+    }
+
     private readonly logger = new Logger(AuthService.name);
 }
