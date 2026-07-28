@@ -159,8 +159,61 @@ export class AuthService {
         return await this.generateAuthResponse(
             user,
         );
-    }    
-        async changePassword(
+
+    }
+
+    private async generateAuthResponse(
+        user: UserDocument,
+    ) {
+        const payload = {
+            sub: user._id.toString(),
+            email: user.email,
+            role: user.role,
+        };
+
+        const accessToken =
+            this.jwtService.sign(
+                payload,
+            );
+
+        const refreshToken =
+            this.jwtService.sign(
+                payload,
+                {
+                    secret:
+                        process.env.JWT_REFRESH_SECRET,
+                    expiresIn: '7d',
+                },
+            );
+
+        const hashedRefreshToken =
+            await bcrypt.hash(
+                refreshToken,
+                10,
+            );
+
+        await this.userService.updateRefreshToken(
+            user._id.toString(),
+            hashedRefreshToken,
+        );
+
+        return {
+            message:
+                'Login Successful',
+            accessToken,
+            refreshToken,
+        };
+    }
+
+    async loginGoogleUser(
+        user: UserDocument,
+    ) {
+        return this.generateAuthResponse(
+            user,
+        );
+    }
+
+    async changePassword(
         userId: string,
         currentPassword: string,
         newPassword: string,
@@ -466,57 +519,6 @@ export class AuthService {
             isVerified: true,
         });
         return user;
-    }
-
-    private async generateAuthResponse(
-        user: UserDocument,
-    ) {
-        const payload = {
-            sub: user._id.toString(),
-            email: user.email,
-            role: user.role,
-        };
-
-        const accessToken =
-            this.jwtService.sign(
-                payload,
-            );
-
-        const refreshToken =
-            this.jwtService.sign(
-                payload,
-                {
-                    secret:
-                        process.env.JWT_REFRESH_SECRET,
-                    expiresIn: '7d',
-                },
-            );
-
-        const hashedRefreshToken =
-            await bcrypt.hash(
-                refreshToken,
-                10,
-            );
-
-        await this.userService.updateRefreshToken(
-            user._id.toString(),
-            hashedRefreshToken,
-        );
-
-        return {
-            message:
-                'Login Successful',
-            accessToken,
-            refreshToken,
-        };
-    }
-
-    async loginGoogleUser(
-        user: UserDocument,
-    ) {
-        return this.generateAuthResponse(
-            user,
-        );
     }
 
     private readonly logger = new Logger(AuthService.name);
