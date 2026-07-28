@@ -12,6 +12,7 @@ import { QUEUE_OPTIONS, QUEUES } from 'src/mail/constants/queue.constants';
 import { MAIL_JOBS } from 'src/mail/constants/job.constants';
 import { SECURITY } from 'src/mail/constants/security.constants';
 import { GoogleUserDto } from './dto/google-user.dto';
+import { UserDocument } from 'src/users/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -504,7 +505,7 @@ export class AuthService {
     }
 
     private async generateAuthResponse(
-        user: any,
+        user: UserDocument,
     ) {
         const payload = {
             sub: user._id.toString(),
@@ -544,6 +545,14 @@ export class AuthService {
             accessToken,
             refreshToken,
         };
+    }
+
+    async loginGoogleUser(
+        user: UserDocument,
+    ) {
+        return this.generateAuthResponse(
+            user,
+        );
     }
 
     private readonly logger = new Logger(AuthService.name);
