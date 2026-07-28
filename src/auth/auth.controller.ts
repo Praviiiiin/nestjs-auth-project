@@ -154,7 +154,7 @@ export class AuthController {
     async googleCallBack(
         @Req() req,
     ) {
-        
+        const user = req.user;
     }
 
 
