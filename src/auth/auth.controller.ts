@@ -13,6 +13,7 @@ import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { THROTTLER } from 'src/mail/constants/throttler.constants';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { GoogleUserDto } from './dto/google-user.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -146,9 +147,16 @@ export class AuthController {
 
     @Get('google')
     @UseGuards(GoogleAuthGuard)
-    googleLogin() {
+    googleLogin() {}
+
+    @Get('google/callback')
+    @UseGuards(GoogleAuthGuard)
+    async googleCallBack(
+        @Req() req,
+    ) {
         
     }
+
 
 }
 
