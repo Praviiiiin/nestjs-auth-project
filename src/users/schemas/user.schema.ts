@@ -32,9 +32,7 @@ export class User {
     })
     provider!: 'local' | 'google' | 'github';
 
-    @Prop({
-        required:true
-    })
+    @Prop()
     password?: string
 
     @Prop()
