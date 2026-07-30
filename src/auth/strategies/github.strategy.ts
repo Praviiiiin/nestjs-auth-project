@@ -3,7 +3,8 @@ import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Profile } from "passport";
 import { Strategy } from "passport-github2";
-import { config } from "process";
+import { GithubUserDto } from "../dto/github-user.dto";
+import { AuthService } from "../auth.service";
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(
@@ -12,6 +13,7 @@ export class GithubStrategy extends PassportStrategy(
 ) {
     constructor(
         private readonly configService: ConfigService,
+        private readonly authService: AuthService,
     ) {
         super({
             clientID: configService.getOrThrow(
@@ -33,6 +35,15 @@ export class GithubStrategy extends PassportStrategy(
         _refreshToken: string,
         profile: Profile
     ) {
+        const githubUser: GithubUserDto = {
+            githubId: profile.id,
+            email: profile.emails?.[0].value ?? '',
+            name: profile.displayName ?? profile.username ?? '',
+            avatar: profile.photos?.[0].value,
+        }
 
+        return await this.authService.validateGithubUser(
+            githubUser,
+        );
     }
 }
