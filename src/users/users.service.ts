@@ -260,5 +260,31 @@ export class UsersService {
             },
         );
     }
+
+    async findByGithubId(
+        githubId: string,
+    ) {
+        return this.userModel.findOneAndReplace({
+            githubId,
+        });
+    }
+
+    async updateGithubAccount(
+        id: string,
+        githubId: string,
+        avatar?: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                githubId,
+                avatar,
+                provider: 'github'
+            },
+            {
+                new: true
+            },
+        );
+    }
 }
 
