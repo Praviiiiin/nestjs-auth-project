@@ -13,6 +13,7 @@ import { MAIL_JOBS } from 'src/mail/constants/job.constants';
 import { SECURITY } from 'src/mail/constants/security.constants';
 import { GoogleUserDto } from './dto/google-user.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
+import { GithubUserDto } from './dto/github-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -518,6 +519,46 @@ export class AuthService {
 
             isVerified: true,
         });
+        return user;
+    }
+
+    async validateGithubUser(
+        dto: GithubUserDto
+    ) {
+        const existingGithubUser = await this.userService.findByGithubId(
+            dto.githubId
+        );
+
+        if(existingGithubUser) {
+            return existingGithubUser;
+        }
+
+        const existingUser = await this.userService.findByEmail(
+            dto.email,
+        );
+
+        if(existingUser) {
+            return await this.userService.updateGithubAccount(
+                existingUser._id.toString(),
+                dto.githubId,
+                dto.avatar
+            )
+        }
+
+        const user = await this.userService.create({
+
+            name: dto.name,
+
+            email: dto.email,
+
+            avatar: dto.avatar,
+
+
+            provider: 'github',
+            
+            isVerified: true,
+        });
+
         return user;
     }
 
