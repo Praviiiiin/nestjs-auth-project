@@ -264,7 +264,7 @@ export class UsersService {
     async findByGithubId(
         githubId: string,
     ) {
-        return this.userModel.findOneAndReplace({
+        return this.userModel.findOne({
             githubId,
         });
     }
