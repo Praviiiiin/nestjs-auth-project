@@ -27,6 +27,8 @@ export class GithubStrategy extends PassportStrategy(
             callbackURL: configService.getOrThrow(
                 'GITHUB_CALLBACK_URL',
             ),
+
+            scope: ['user:email'],
         });
     }
 
@@ -37,7 +39,7 @@ export class GithubStrategy extends PassportStrategy(
     ) {
         const githubUser: GithubUserDto = {
             githubId: profile.id,
-            email: profile.emails?.[0].value ?? '',
+            email: profile.emails?.[0].value || '',
             name: profile.displayName ?? profile.username ?? '',
             avatar: profile.photos?.[0].value,
         }
