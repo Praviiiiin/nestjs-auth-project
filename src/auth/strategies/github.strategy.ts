@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
-import { Profile } from "passport";
-import { Strategy } from "passport-github2";
+import { Profile, Strategy } from "passport-github2";
 import { GithubUserDto } from "../dto/github-user.dto";
 import { AuthService } from "../auth.service";
 
@@ -37,6 +36,9 @@ export class GithubStrategy extends PassportStrategy(
         _refreshToken: string,
         profile: Profile
     ) {
+
+        console.log(profile);
+
         const githubUser: GithubUserDto = {
             githubId: profile.id,
             email: profile.emails?.[0].value || '',
