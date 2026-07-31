@@ -562,5 +562,13 @@ export class AuthService {
         return user;
     }
 
+    async loginGithubUser(
+        user: UserDocument
+    ) {
+        return await this.generateAuthResponse(
+            user,
+        )
+    }
+
     private readonly logger = new Logger(AuthService.name);
 }
