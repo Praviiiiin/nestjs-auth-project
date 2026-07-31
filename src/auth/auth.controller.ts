@@ -13,7 +13,7 @@ import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { THROTTLER } from 'src/mail/constants/throttler.constants';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { GoogleUserDto } from './dto/google-user.dto';
+import { GithubAuthGuard } from './guards/github-auth.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -158,6 +158,21 @@ export class AuthController {
             req.user,
         );
     }
+
+    @Get('github')
+    @UseGuards(GithubAuthGuard)
+    githubLogin() {}
+
+    @Get('github/callback')
+    @UseGuards(GithubAuthGuard)
+    async githubCallBack(
+        @Req() req,
+    ) {
+        return await this.authService.loginGithubUser(
+            req.user,
+        )
+    }
+
 
 
 }
