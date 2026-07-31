@@ -533,6 +533,12 @@ export class AuthService {
             return existingGithubUser;
         }
 
+        if(!dto.email) {
+            throw new UnauthorizedException(
+                'Github account does not provide an email address',
+            );
+        }
+
         const existingUser = await this.userService.findByEmail(
             dto.email,
         );
