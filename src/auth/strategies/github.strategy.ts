@@ -27,7 +27,11 @@ export class GithubStrategy extends PassportStrategy(
                 'GITHUB_CALLBACK_URL',
             ),
 
-            scope: ['user:email'],
+            scope: [
+                'read:user',
+                'user:email'
+            ],
+            
         });
     }
 
