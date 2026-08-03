@@ -10,6 +10,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { THROTTLER } from './mail/constants/throttler.constants';
 import { APP_GUARD } from '@nestjs/core';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { UploadModule } from './upload/upload.module';
 
 
 @Module({
@@ -44,6 +45,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     UsersModule,
     RedisModule,
     BullBoardModule,
+    UploadModule,
   ],
   
   providers: [
