@@ -169,7 +169,7 @@ export class AuthController {
         @Req() req,
     ) {
         return await this.authService.loginGithubUser(
-            req.user,
+            req.user
         )
     }
 
