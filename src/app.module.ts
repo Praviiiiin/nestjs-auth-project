@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule, NotImplementedException } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -9,6 +9,7 @@ import { BullBoardModule } from './bull-board/bull-board.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { THROTTLER } from './mail/constants/throttler.constants';
 import { APP_GUARD } from '@nestjs/core';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 
 @Module({
@@ -52,6 +53,11 @@ import { APP_GUARD } from '@nestjs/core';
     }
   ],
 }) 
-export class AppModule {}
+
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
 
 
