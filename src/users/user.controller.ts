@@ -140,4 +140,5 @@ export class UsersController {
             type: file.mimetype
         };
     } 
+
 }
