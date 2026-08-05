@@ -11,6 +11,7 @@ import { THROTTLER } from './mail/constants/throttler.constants';
 import { APP_GUARD } from '@nestjs/core';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { UploadModule } from './upload/upload.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -46,6 +47,7 @@ import { UploadModule } from './upload/upload.module';
     RedisModule,
     BullBoardModule,
     UploadModule,
+    CloudinaryModule,
   ],
   
   providers: [
