@@ -1,9 +1,14 @@
 import { Controller, Post, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import 'multer';
+import { UploadService } from './upload.service';
 
 @Controller('upload')
 export class UploadController {
+
+    constructor(
+        private readonly uploadService: UploadService
+    ) {}
 
     @Post()
     @UseInterceptors(
@@ -27,6 +32,8 @@ export class UploadController {
         )
         file: Express.Multer.File
     ) {
-        return file;
+        return this.uploadService.uploadImage(
+            file,
+        );
     }
 }
