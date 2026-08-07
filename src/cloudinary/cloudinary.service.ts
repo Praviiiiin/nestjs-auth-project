@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v2 as Cloudinary } from 'cloudinary'
 import { UploadApiResponse } from 'cloudinary';
-import { resolve } from 'path';
 import { Readable } from 'stream';
 
 @Injectable()
@@ -22,7 +21,7 @@ export class CloudinaryService {
 
                 const upload = this.cloudinary.uploader.upload_stream(
                     {
-                        folder: 'nestjs-auth',
+                        folder: 'NestJS Authentication',
                     },
                     (error, result) => {
 
