@@ -286,5 +286,20 @@ export class UsersService {
             },
         );
     }
+
+    async updateAvatar(
+        userId: string,
+        avatar: string,
+    ) {
+        return await this.userModel.findByIdAndUpdate(
+            userId,
+            {
+                avatar,
+            },
+            {
+                new: true,
+            },
+        );
+    }
 }
 
