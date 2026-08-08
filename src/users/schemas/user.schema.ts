@@ -42,6 +42,7 @@ export class User {
     refreshToken?: string;
 
     @Prop({
+        enum: Role,
         default: Role.USER,
     })
     role!: Role;
