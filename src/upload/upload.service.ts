@@ -18,11 +18,14 @@ export class UploadService {
             file,
         );
 
-        await this.usersService.updateAvatar(
+        const updatedUser = await this.usersService.updateAvatar(
             userId,
             result.secure_url,
         );
 
-        return result;
+        return  {
+            message: 'Avatar updated successfully',
+            user: updatedUser
+        };
     }
 }
