@@ -290,11 +290,13 @@ export class UsersService {
     async updateAvatar(
         userId: string,
         avatar: string,
+        avatarPublic: string,
     ) {
         return await this.userModel.findByIdAndUpdate(
             userId,
             {
                 avatar,
+                avatarPublic,
             },
             {
                 new: true,
