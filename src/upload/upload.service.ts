@@ -21,6 +21,7 @@ export class UploadService {
         const updatedUser = await this.usersService.updateAvatar(
             userId,
             result.secure_url,
+            result.public_id,
         );
 
         return  {
