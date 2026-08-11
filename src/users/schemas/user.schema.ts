@@ -29,6 +29,9 @@ export class User {
     @Prop()
     avatar?: string;
 
+    @Prop()
+    avatarPublic?: string;
+
     @Prop({
         enum: ['local', 'google', 'github'],
         default: 'local',
