@@ -16,10 +16,6 @@ export class UploadService {
     ) {
         const user = await this.usersService.findById(userId);
 
-        if (user?.avatarPublic) {
-            await this.cloudinaryService.deleteImage(user.avatarPublic);
-        }
-
         const result = await this.cloudinaryService.uploadImage(file, userId);
 
         await this.usersService.updateAvatar(
@@ -27,6 +23,10 @@ export class UploadService {
             result.secure_url,
             result.public_id,
         );
+
+        if (user?.avatarPublic) {
+            await this.cloudinaryService.deleteImage(user.avatarPublic);
+        }
 
         return {
             message: 'Avatar updated successfully',
