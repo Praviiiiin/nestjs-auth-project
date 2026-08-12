@@ -14,20 +14,23 @@ export class UploadService {
         file: Express.Multer.File,
         userId: string,
     ) {
-        const result = await this.cloudinaryService.uploadImage(
-            file,
-            'avatars',
-        );
+        const user = await this.usersService.findById(userId);
 
-        const updatedUser = await this.usersService.updateAvatar(
+        if (user?.avatarPublic) {
+            await this.cloudinaryService.deleteImage(user.avatarPublic);
+        }
+
+        const result = await this.cloudinaryService.uploadImage(file, userId);
+
+        await this.usersService.updateAvatar(
             userId,
             result.secure_url,
             result.public_id,
         );
 
-        return  {
+        return {
             message: 'Avatar updated successfully',
-            user: updatedUser
+            imageUrl: result.secure_url,
         };
     }
 }
