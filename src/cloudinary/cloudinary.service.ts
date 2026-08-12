@@ -14,6 +14,7 @@ export class CloudinaryService {
 
     async uploadImage(
         file: Express.Multer.File,
+        userId: string,
     ): Promise<UploadApiResponse> {
 
         return new Promise(
