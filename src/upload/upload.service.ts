@@ -16,6 +16,7 @@ export class UploadService {
     ) {
         const result = await this.cloudinaryService.uploadImage(
             file,
+            'avatars',
         );
 
         const updatedUser = await this.usersService.updateAvatar(
