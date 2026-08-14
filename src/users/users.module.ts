@@ -4,6 +4,7 @@ import { UsersController } from './user.controller';
 import { UsersService } from './users.service';
 import { User, UserSchema } from "./schemas/user.schema"
 import { RedisModule } from 'src/redis/redis.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports : [
@@ -14,7 +15,8 @@ import { RedisModule } from 'src/redis/redis.module';
       },
     ]),
 
-    RedisModule
+    RedisModule,
+    CloudinaryModule,
   ],
   controllers: [
     UsersController,
