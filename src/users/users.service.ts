@@ -6,6 +6,7 @@ import { Role } from 'src/auth/enums/role.enum';
 import { RedisService } from 'src/redis/redis.service';
 import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
 import { CACHE_KEYS, CACHE } from 'src/mail/constants/cache.constants';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,7 @@ export class UsersService {
         @InjectModel(User.name)
         private userModel: Model<UserDocument>,
         private readonly redisService: RedisService,
+        private readonly cloudinaryService: CloudinaryService
     ) {}
     async create (data: Partial<User>) {
         return this.userModel.create(data);
