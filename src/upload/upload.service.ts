@@ -18,11 +18,19 @@ export class UploadService {
 
         const result = await this.cloudinaryService.uploadImage(file, userId);
 
-        await this.usersService.updateAvatar(
-            userId,
-            result.secure_url,
-            result.public_id,
-        );
+        try {
+            await this.usersService.updateAvatar(
+                userId,
+                result.secure_url,
+                result.public_id,
+            );
+        } catch (error) {
+            await this.cloudinaryService.deleteImage(
+                result.public_id,
+            )
+
+            throw error;
+        }
 
         if (user?.avatarPublic) {
             await this.cloudinaryService.deleteImage(user.avatarPublic);
