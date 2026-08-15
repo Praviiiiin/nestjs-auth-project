@@ -27,7 +27,7 @@ export class UsersService {
     async findById(id: string) {
 
         type CachedUser = Omit<User, never> & { _id: string };
-        const cacheKey = `${CACHE_KEYS.USER}`;
+        const cacheKey = `${CACHE_KEYS.USER}:${id}`;
         const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
 
         if(cachedUser) {
@@ -61,7 +61,7 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(`${CACHE_KEYS.USER}`)
+        await this.redisService.del(`${CACHE_KEYS.USER}:${id}`)
         return user;
     }
 
