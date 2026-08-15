@@ -69,7 +69,7 @@ export class UsersService {
         id: string,
         password: string,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 password,
@@ -78,6 +78,10 @@ export class UsersService {
                 returnDocument: "after"
             },
         );
+
+        await this.redisService.del(`${CACHE_KEYS.USER}:${id}`);
+
+        return user;
     }
 
     async updateRefreshToken (
@@ -249,7 +253,7 @@ export class UsersService {
         googleId: string,
         avatar?: string,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 googleId,
@@ -261,6 +265,10 @@ export class UsersService {
                 new: true,
             },
         );
+
+        await this.redisService.del(
+            `${CACHE_KEYS.USER}:${id}`
+        )
     }
 
     async findByGithubId(
@@ -276,7 +284,7 @@ export class UsersService {
         githubId: string,
         avatar?: string,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 githubId,
@@ -287,6 +295,10 @@ export class UsersService {
                 new: true
             },
         );
+
+        await this.redisService.del(
+            `${CACHE_KEYS.USER}:${id}`
+        )
     }
 
     async updateAvatar(
