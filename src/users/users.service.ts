@@ -154,7 +154,25 @@ export class UsersService {
     }
 
     async deleteUser(id: string) {
-        return this.userModel.findByIdAndDelete(id);
+        const user = await this.userModel.findById(id);
+
+        if(!user) {
+            return null;
+        }
+
+        if(user.avatarPublic) {
+            await this.cloudinaryService.deleteImage(
+                user.avatarPublic,
+            );
+        }
+
+        const deletedUser = await this.userModel.findByIdAndDelete(id);
+
+        await this.redisService.del(
+            `${CACHE_KEYS.USER}:${id}`,
+        );
+
+        return deletedUser;
     }
 
     async updateRole(
