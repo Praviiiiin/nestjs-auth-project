@@ -160,17 +160,21 @@ export class UsersService {
             return null;
         }
 
-        if(user.avatarPublic) {
-            await this.cloudinaryService.deleteImage(
-                user.avatarPublic,
-            );
-        }
-
         const deletedUser = await this.userModel.findByIdAndDelete(id);
 
         await this.redisService.del(
             `${CACHE_KEYS.USER}:${id}`,
         );
+
+        if(user.avatarPublic) {
+            try {
+                await this.cloudinaryService.deleteImage(
+                    user.avatarPublic,
+                );
+            } catch (error) {
+                console.error('Failed to delete Cloudinary avatar:', error)
+            }       
+        }
 
         return deletedUser;
     }
