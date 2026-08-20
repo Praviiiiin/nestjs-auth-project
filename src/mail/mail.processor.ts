@@ -28,8 +28,8 @@ export class MailProcessor extends WorkerHost {
                 const data = job.data as VerificationMailJob;
 
                 await this.mailService.sendVerificationEmail(
-                    job.data.email,
-                    job.data.verificationToken,
+                    data.email,
+                    data.verificationToken,
                 );
 
                 break;
@@ -40,8 +40,8 @@ export class MailProcessor extends WorkerHost {
             
 
                 await this.mailService.sendResetPasswordEmail(
-                    job.data.email,
-                    job.data.resetPasswordToken,
+                    data.email,
+                    data.resetPasswordToken,
                 );
 
                 break;
