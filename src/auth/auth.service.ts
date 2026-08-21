@@ -368,6 +368,13 @@ export class AuthService {
                 email,
                 resetPasswordToken: token,
             },
+            {
+                attempts: 3,
+                backoff: {
+                    type: 'exponential',
+                    delay: 5000,
+                },
+            },
         );
 
         return {
