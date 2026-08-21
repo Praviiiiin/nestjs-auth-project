@@ -474,6 +474,13 @@ export class AuthService {
                 email,
                 token: verificationToken,
             },
+            {
+                attempts: 3,
+                backoff: {
+                    type: 'exponential',
+                    delay: 5000,
+                },
+            },
         );
 
         return {
