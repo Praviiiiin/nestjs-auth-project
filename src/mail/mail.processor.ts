@@ -70,7 +70,7 @@ export class MailProcessor extends WorkerHost {
         job: Job,
         error: Error,
     ) {
-        this.logger.log(
+        this.logger.error(
             `Job "${job?.name}" failed (ID: ${job?.id})`,
             error.stack,
         )
