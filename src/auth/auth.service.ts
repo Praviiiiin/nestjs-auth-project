@@ -67,8 +67,9 @@ export class AuthService {
         await this.mailQueue.add(MAIL_JOBS.SEND_VERIFICATION,
             {
                 email,
-                token: verificationToken,
+                verificationToken,
             },
+            
         );
 
         return {
@@ -479,7 +480,7 @@ export class AuthService {
             MAIL_JOBS.SEND_VERIFICATION,
             {
                 email,
-                token: verificationToken,
+                verificationToken,
             },
             {
                 attempts: 3,
