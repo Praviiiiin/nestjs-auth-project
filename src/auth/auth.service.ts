@@ -370,12 +370,14 @@ export class AuthService {
                 resetPasswordToken: token,
             },
             {
-                attempts: 3,
+                attempts: QUEUE_OPTIONS.ATTEMPTS,
                 backoff: {
                     type: 'exponential',
-                    delay: 5000,
+                    delay: QUEUE_OPTIONS.BACKOFF_DELAY,
                 },
-            },
+                removeOnComplete: QUEUE_OPTIONS.REMOVE_ON_COMPLETE,
+                removeOnFail: QUEUE_OPTIONS.REMOVE_ON_FAIL
+            }
         );
 
         return {
