@@ -121,7 +121,7 @@ export class AuthService {
             const attempts =
                 user.failedLoginAttempts + 1;
 
-            if (attempts >= 5) {
+            if (attempts >= SECURITY.MAX_LOGIN_ATTEMPTS) {
 
                 await this.userService.updateLoginAttempts(
                     user._id.toString(),
