@@ -1,5 +1,5 @@
 export const CACHE_KEYS = {
-    USER: 'user',
+    USER: (id: string) => `user:{id}`,
 } as const;
 
 export const CACHE = {
