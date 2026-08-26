@@ -27,7 +27,7 @@ export class UsersService {
     async findById(id: string) {
 
         type CachedUser = Omit<User, never> & { _id: string };
-        const cacheKey = `${CACHE_KEYS.USER}:${id}`;
+        const cacheKey = CACHE_KEYS.USER(id);
         const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
 
         if(cachedUser) {
@@ -61,7 +61,7 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(`${CACHE_KEYS.USER}:${id}`)
+        await this.redisService.del(CACHE_KEYS.USER(id))
         return user;
     }
 
@@ -79,7 +79,7 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(`${CACHE_KEYS.USER}:${id}`);
+        await this.redisService.del(CACHE_KEYS.USER(id));
 
         return user;
     }
@@ -163,7 +163,7 @@ export class UsersService {
         const deletedUser = await this.userModel.findByIdAndDelete(id);
 
         await this.redisService.del(
-            `${CACHE_KEYS.USER}:${id}`,
+            CACHE_KEYS.USER(id),
         );
 
         if(user.avatarPublic) {
@@ -289,7 +289,7 @@ export class UsersService {
         );
 
         await this.redisService.del(
-            `${CACHE_KEYS.USER}:${id}`
+            CACHE_KEYS.USER(id)
         )
     }
 
@@ -319,7 +319,7 @@ export class UsersService {
         );
 
         await this.redisService.del(
-            `${CACHE_KEYS.USER}:${id}`
+            CACHE_KEYS.USER(id)
         )
     }
 
