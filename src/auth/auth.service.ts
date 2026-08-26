@@ -21,9 +21,6 @@ export class AuthService {
         private userService: UsersService,
         private jwtService: JwtService,
 
-        @Inject('MAIL_PROVIDER')
-        private mailService: MailProvider,
-
         @InjectQueue(QUEUES.MAIL)
         private readonly mailQueue: Queue
     ) {}
@@ -134,7 +131,7 @@ export class AuthService {
 
                 await this.userService.updateLoginAttempts(
                     user._id.toString(),
-                    QUEUE_OPTIONS.ATTEMPTS,
+                    attempts,
                     new Date(
                         Date.now() +
                         SECURITY.ACCOUNT_LOCK_MINUTES,
@@ -148,7 +145,7 @@ export class AuthService {
 
             await this.userService.updateLoginAttempts(
                 user._id.toString(),
-                QUEUE_OPTIONS.ATTEMPTS,
+                attempts,
             );
 
             this.logger.warn(`Invalid login attempt for ${email}`);
@@ -163,7 +160,7 @@ export class AuthService {
 
         await this.userService.updateLoginAttempts(
             user._id.toString(),
-            3,
+            0,
             undefined,
         );
 
