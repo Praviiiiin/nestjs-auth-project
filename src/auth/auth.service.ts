@@ -227,9 +227,7 @@ export class AuthService {
         newPassword: string,
     ) {
         const user =
-            await this.userService.findById(
-                userId,
-            );
+            await this.userService.findByIdWithCredentials(decoded.sub);
 
         if (!user) {
             throw new BadRequestException(
@@ -285,7 +283,7 @@ export class AuthService {
             );
 
         const user =
-            await this.userService.findById(
+            await this.userService.findByIdWithCredentials(
                 decoded.sub,
             );
 
