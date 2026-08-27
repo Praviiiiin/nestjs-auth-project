@@ -52,7 +52,7 @@ export class UsersService {
     async findByIdWithCredentials(id: string) {
         return this.userModel.findById(id);
     }
-    
+
     async updateUser(
         id: string,
         updateData: UpdateUserDto,
@@ -92,7 +92,7 @@ export class UsersService {
         id: string,
         refreshToken: string,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 refreshToken,
@@ -101,12 +101,18 @@ export class UsersService {
                 returnDocument: "after",
             },
         );
+
+        await this.redisService.del(
+            CACHE_KEYS.USER(id)
+        );
+
+        return user;
     }
 
     async removeRefreshToken(
         id: string,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 refreshToken: null
@@ -115,6 +121,12 @@ export class UsersService {
                 returnDocument: "after",
             },
         );
+
+        await this.redisService.del(
+            CACHE_KEYS.USER(id),
+        );
+
+        return user;
     }
 
     async findAll(
