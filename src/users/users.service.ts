@@ -49,6 +49,10 @@ export class UsersService {
         return user;
     }
 
+    async findByIdWithCredentials(id: string) {
+        return this.userModel.findById(id);
+    }
+    
     async updateUser(
         id: string,
         updateData: UpdateUserDto,
