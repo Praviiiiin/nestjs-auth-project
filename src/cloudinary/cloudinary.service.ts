@@ -23,6 +23,7 @@ export class CloudinaryService {
                 const upload = this.cloudinary.uploader.upload_stream(
                     {
                         folder: 'NestJS Authentication/avatars',
+                        public_id: userId,
                         resource_type: 'image',
                     },
                     (error, result) => {
