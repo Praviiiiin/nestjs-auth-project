@@ -447,6 +447,10 @@ export class AuthService {
 
         await user.save();
 
+        await this.userService.invalidateUserCache(
+            user._id.toString(),
+        )
+
         return {
             message:
                 'Email verified successfully',
@@ -481,6 +485,10 @@ export class AuthService {
             verificationToken;
 
         await user.save();
+
+        await this.userService.invalidateUserCache(
+            user._id.toString(),
+        )
 
         await this.mailQueue.add(
             MAIL_JOBS.SEND_VERIFICATION,
