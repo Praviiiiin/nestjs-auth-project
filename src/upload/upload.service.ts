@@ -14,7 +14,7 @@ export class UploadService {
         file: Express.Multer.File,
         userId: string,
     ) {
-        const user = await this.usersService.findById(userId);
+        const user = await this.usersService.findByIdFromDatabase(userId);
 
         const result = await this.cloudinaryService.uploadImage(file, userId);
 
