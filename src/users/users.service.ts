@@ -53,6 +53,18 @@ export class UsersService {
         return this.userModel.findById(id);
     }
 
+    async invalidateUserCache(
+        userId: string,
+    ) {
+        await this.redisService.del(
+            CACHE_KEYS.USER(userId),        
+        );
+    }
+
+    async findByIdFromDatabase(id: string) {
+        return this.userModel.findById(id);
+    }
+
     async updateUser(
         id: string,
         updateData: UpdateUserDto,
@@ -199,7 +211,7 @@ export class UsersService {
         id: string,
         role: Role,
     ) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 role,
@@ -208,6 +220,13 @@ export class UsersService {
                 returnDocument: 'after'
             }
         ).select('-password -refreshToken');
+
+        await this.redisService.del(
+            CACHE_KEYS.USER(id),
+        );
+
+        return user;
+
     }
 
     async updateResetToken(
@@ -306,7 +325,9 @@ export class UsersService {
 
         await this.redisService.del(
             CACHE_KEYS.USER(id)
-        )
+        );
+
+        return user;
     }
 
     async findByGithubId(
@@ -336,7 +357,9 @@ export class UsersService {
 
         await this.redisService.del(
             CACHE_KEYS.USER(id)
-        )
+        );
+
+        return user;
     }
 
     async updateAvatar(
@@ -344,7 +367,7 @@ export class UsersService {
         avatar: string,
         avatarPublic: string,
     ) {
-        return await this.userModel.findByIdAndUpdate(
+        const user =  await this.userModel.findByIdAndUpdate(
             userId,
             {
                 avatar,
@@ -354,6 +377,12 @@ export class UsersService {
                 new: true,
             },
         );
+
+        await this.redisService.del(
+            CACHE_KEYS.USER(userId),
+        );
+
+        return user;
     }
 }
 
