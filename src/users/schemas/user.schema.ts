@@ -64,6 +64,9 @@ export class User {
     @Prop()
     emailVerificationToken?: string;
 
+    @Prop()
+    emailVerificationTokenExpires?: Date;
+
     @Prop({
         default: 0,
     })
