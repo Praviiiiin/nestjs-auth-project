@@ -34,7 +34,7 @@ export class UsersService {
             return this.userModel.hydrate(cachedUser)
         }
 
-        const user = await this.userModel.findById(id).select('-password -refreshToken -resetPassword -resetPasswordExpires -emailVerificationTokken');
+        const user = await this.userModel.findById(id).select('-password -refreshToken -resetPassword -resetPasswordExpires -emailVerificationToken');
 
         if(!user) {
             return null;
