@@ -271,58 +271,59 @@ export class AuthService {
     }
 
     async refreshToken(
-        refreshToken: string,
-    ) {
-        const decoded: any =
-            this.jwtService.verify(
-                refreshToken,
-                {
-                    secret:
-                        process.env.JWT_REFRESH_SECRET,
-                },
-            );
+    refreshToken: string,
+) {
+    let decoded: { sub: string };
 
-        const user =
-            await this.userService.findByIdWithCredentials(
-                decoded.sub,
-            );
-
-        if (
-            !user ||
-            !user.refreshToken
-        ) {
-            throw new BadRequestException(
-                'Access denied',
-            );
-        }
-
-        const isRefreshTokenValid =
-            await bcrypt.compare(
-                refreshToken,
-                user.refreshToken,
-            );
-
-        if (!isRefreshTokenValid) {
-            throw new BadRequestException(
-                'Access denied',
-            );
-        }
-
-        const payload = {
-            sub: user._id.toString(),
-            email: user.email,
-            role: user.role,
-        };
-
-        const accessToken =
-            this.jwtService.sign(
-                payload,
-            );
-
-        return {
-            accessToken,
-        };
+    try {
+        decoded = this.jwtService.verify(
+            refreshToken,
+            {
+                secret: process.env.JWT_REFRESH_SECRET,
+            },
+        );
+    } catch {
+        throw new UnauthorizedException(
+            'Invalid or expired refresh token',
+        );
     }
+
+    const user =
+        await this.userService.findByIdWithCredentials(
+            decoded.sub,
+        );
+
+    if (!user || !user.refreshToken) {
+        throw new UnauthorizedException(
+            'Invalid or expired refresh token',
+        );
+    }
+
+    const isRefreshTokenValid =
+        await bcrypt.compare(
+            refreshToken,
+            user.refreshToken,
+        );
+
+    if (!isRefreshTokenValid) {
+        throw new UnauthorizedException(
+            'Invalid or expired refresh token',
+        );
+    }
+
+    const payload = {
+        sub: user._id.toString(),
+        email: user.email,
+        role: user.role,
+    };
+
+    const accessToken =
+        this.jwtService.sign(payload);
+
+    return {
+        accessToken,
+    };
+}
 
     async logout(
         userId: string,
