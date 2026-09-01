@@ -358,7 +358,7 @@ export class AuthService {
         const expires =
             new Date(
                 Date.now() +
-                SECURITY.ACCOUNT_LOCK_MINUTES,
+                SECURITY.PASSWORD_RESET_TOKEN_MINUTES * 60 * 1000,
             );
 
         await this.userService.updateResetToken(
