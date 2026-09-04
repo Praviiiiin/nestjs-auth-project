@@ -360,6 +360,8 @@ export class AuthService {
             crypto.randomBytes(32)
                 .toString('hex');
 
+        const hashedToken = this.hashResetToken(token);
+
         const expires =
             new Date(
                 Date.now() +
@@ -368,7 +370,7 @@ export class AuthService {
 
         await this.userService.updateResetToken(
             user._id.toString(),
-            token,
+            hashedToken,
             expires,
         );
 
@@ -399,9 +401,11 @@ export class AuthService {
         token: string,
         newPassword: string,
     ) {
+        const hashedToken = this.hashResetToken(token);
+
         const user =
             await this.userService.findResetToken(
-                token,
+                hashedToken,
             );
 
         if (!user) {
@@ -616,6 +620,12 @@ export class AuthService {
         return await this.generateAuthResponse(
             user,
         )
+    }
+
+    private hashResetToken(
+        token: string
+    ): string {
+        return crypto.createHash('sha256').update(token).digest('hex');
     }
 
     private readonly logger = new Logger(AuthService.name);
