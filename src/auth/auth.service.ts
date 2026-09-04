@@ -53,12 +53,16 @@ export class AuthService {
             crypto.randomBytes(32)
                 .toString('hex');
 
+        const verificationTokenExpires = new Date(
+            Date.now() + SECURITY.EMAIL_VERIFICATION_TOKEN_MINUTES
+        )
+
         await this.userService.create({
             name,
             email,
             password: hashedPassword,
-            emailVerificationToken:
-            verificationToken,
+            emailVerificationToken: verificationToken,
+            emailVerificationTokenExpires: verificationTokenExpires
         });
 
         await this.mailQueue.add(MAIL_JOBS.SEND_VERIFICATION,
@@ -347,9 +351,9 @@ export class AuthService {
             );
 
         if (!user) {
-            throw new BadRequestException(
-                'User not found',
-            );
+            return {
+                message: 'If am account with that email exists, a password reset email has been sent.',
+            }
         }
 
         const token =
@@ -446,6 +450,8 @@ export class AuthService {
         user.emailVerificationToken =
             undefined;
 
+        user.emailVerificationTokenExpires = undefined;
+
         await user.save();
 
         await this.userService.invalidateUserCache(
@@ -481,6 +487,10 @@ export class AuthService {
         const verificationToken =
             crypto.randomBytes(32)
                 .toString('hex');
+
+        const verificationTokenExpires = new Date(
+            Date.now() + SECURITY.EMAIL_VERIFICATION_TOKEN_MINUTES * 60 * 1000,
+        )
 
         user.emailVerificationToken =
             verificationToken;
