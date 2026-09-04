@@ -34,7 +34,7 @@ export class UsersService {
             return this.userModel.hydrate(cachedUser)
         }
 
-        const user = await this.userModel.findById(id).select('-password -refreshToken -resetPassword -resetPasswordExpires -emailVerificationToken');
+        const user = await this.userModel.findById(id).select('-password -refreshToken -resetPassword -resetPasswordExpires -emailVerificationToken, -emailVerificationTokenExpires');
 
         if(!user) {
             return null;
@@ -277,6 +277,9 @@ export class UsersService {
     ) {
         return this.userModel.findOne({
             emailVerificationToken: token,
+            emailVerificationTokenExpires: {
+                $gt: new Date(),
+            },
         });
     }
 
