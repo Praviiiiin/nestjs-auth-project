@@ -53,6 +53,9 @@ export class AuthService {
             crypto.randomBytes(32)
                 .toString('hex');
 
+
+        const hashedVerificationToken = this.hashResetToken(verificationToken)        
+
         const verificationTokenExpires = new Date(
             Date.now() + SECURITY.EMAIL_VERIFICATION_TOKEN_MINUTES
         )
@@ -438,9 +441,11 @@ export class AuthService {
         async verifyEmail(
         token: string,
     ) {
+
+        const hashedToken = this.hashResetToken(token);
         const user =
             await this.userService.findByVerificationToken(
-                token,
+                hashedToken,
             );
 
         if (!user) {
@@ -492,12 +497,15 @@ export class AuthService {
             crypto.randomBytes(32)
                 .toString('hex');
 
+        const hashedVerificationToken = this.hashResetToken(verificationToken);
+
         const verificationTokenExpires = new Date(
             Date.now() + SECURITY.EMAIL_VERIFICATION_TOKEN_MINUTES * 60 * 1000,
-        )
+        );
 
-        user.emailVerificationToken =
-            verificationToken;
+        user.emailVerificationToken = hashedVerificationToken;
+
+        user.emailVerificationTokenExpires = verificationTokenExpires;
 
         await user.save();
 
