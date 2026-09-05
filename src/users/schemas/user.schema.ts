@@ -75,6 +75,14 @@ export class User {
     @Prop()
     lockUntil?: Date;
 
+    @Prop({
+        default: false,
+    })
+    twoFactorEnabled!: boolean;
+
+    @Prop()
+    twoFactorSecret?: string;
+
 }    
 
 export const UserSchema = SchemaFactory.createForClass(User)
