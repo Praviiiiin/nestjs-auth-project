@@ -387,5 +387,19 @@ export class UsersService {
 
         return user;
     }
+
+    async setTwoFactorSecret(
+        id: string,
+        secret: string,
+    ){
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                twoFactorSecret: secret,
+                twoFactorEnabled: false,
+            },
+            { new: true },
+        );
+    }
 }
 
