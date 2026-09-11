@@ -14,12 +14,14 @@ import { SECURITY } from 'src/mail/constants/security.constants';
 import { GoogleUserDto } from './dto/google-user.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { GithubUserDto } from './dto/github-user.dto';
+import { TwoFactorService } from './two-factor.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UsersService,
         private jwtService: JwtService,
+        private readonly twoFactorService: TwoFactorService,
 
         @InjectQueue(QUEUES.MAIL)
         private readonly mailQueue: Queue
@@ -634,6 +636,28 @@ export class AuthService {
         token: string
     ): string {
         return crypto.createHash('sha256').update(token).digest('hex');
+    }
+
+    async setupTwoFactor(user: UserDocument) {
+        const secret = this.twoFactorService.generateSecret();
+
+        await this.userService.setTwoFactorSecret(
+            user._id.toString(),
+            secret,
+        );
+
+        const otpauthUrl = this.twoFactorService.generateOtpAuthUrl(
+            user.email,
+            secret,
+        );
+
+        const qrCode = await this.twoFactorService.generateQrCode(
+            otpauthUrl,
+        );
+
+        return {
+            message: 'Scan the QR code with your authenticator app', qrCode
+        };
     }
 
     private readonly logger = new Logger(AuthService.name);
