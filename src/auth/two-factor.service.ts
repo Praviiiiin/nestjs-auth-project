@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { generateSecret, generateURI, verify } from 'otplib';
+import * as QRCode from 'qrcode';
 
 @Injectable()
 export class TwoFactorService {
@@ -16,6 +17,10 @@ export class TwoFactorService {
             label: email,
             secret,
         });        
+    }
+
+    async generateQrCode(otpauthUrl: string): Promise<string> {
+        return QRCode.toDataURL(otpauthUrl);
     }
 
     async verifyCode(
