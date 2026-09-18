@@ -401,5 +401,15 @@ export class UsersService {
             { new: true },
         );
     }
+
+    async enableTwoFactor(id : string) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                twoFactorEnabled: true,
+            },
+            {new: true},
+        );
+    }
 }
 
