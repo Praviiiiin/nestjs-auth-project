@@ -14,6 +14,7 @@ import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { THROTTLER } from 'src/mail/constants/throttler.constants';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { GithubAuthGuard } from './guards/github-auth.guard';
+import type { UserDocument } from 'src/users/schemas/user.schema';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -171,6 +172,14 @@ export class AuthController {
         return await this.authService.loginGithubUser(
             req.user
         )
+    }
+
+    @Post('2fa/setup')
+    @UseGuards(JwtAuthGuard)
+    async setupTwoFactor(
+        @CurrentUser() user: UserDocument,
+    ) {
+        return this.authService.setupTwoFactor(user);
     }
 
 
