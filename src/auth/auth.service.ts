@@ -143,7 +143,7 @@ export class AuthService {
                     attempts,
                     new Date(
                         Date.now() +
-                        SECURITY.ACCOUNT_LOCK_MINUTES,
+                        SECURITY.ACCOUNT_LOCK_MINUTES * 60 * 1000,
                     ),
                 );
 
