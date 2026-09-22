@@ -97,6 +97,7 @@ export class AuthService {
         const {
             email,
             password,
+            twoFactorCode,
         } = body;
 
         const user =
@@ -165,6 +166,32 @@ export class AuthService {
             throw new BadRequestException(
                 'Please verify your email first.',
             );
+        }
+
+        if(user.twoFactorEnabled) {
+            
+            if(!twoFactorCode) {
+                throw new UnauthorizedException(
+                    'Two factor authentication code is required',
+                );
+            }
+
+            if(!user.twoFactorSecret) {
+                throw new UnauthorizedException(
+                    'Two factor authentication is not configured correctly'
+                );
+            }
+
+            const isTwoFactorValid = await this.twoFactorService.verifyCode(
+                user.twoFactorSecret,
+                twoFactorCode,
+            );
+
+            if(!isTwoFactorValid) {
+                throw new UnauthorizedException(
+                    'Invalid two factor authentication code'
+                )
+            }
         }
 
         await this.userService.updateLoginAttempts(
