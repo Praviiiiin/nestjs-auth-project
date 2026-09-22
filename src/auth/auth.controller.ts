@@ -15,6 +15,7 @@ import { THROTTLER } from 'src/mail/constants/throttler.constants';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { GithubAuthGuard } from './guards/github-auth.guard';
 import type { UserDocument } from 'src/users/schemas/user.schema';
+import { VerifyTwoFactorDto } from './dto/verify-two-factor.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -182,7 +183,17 @@ export class AuthController {
         return this.authService.setupTwoFactor(user);
     }
 
-
+    @Post('2fa/verify')
+    @UseGuards(JwtAuthGuard)
+    async verifyTwoFactor(
+        @CurrentUser() user: UserDocument,
+        @Body() dto: VerifyTwoFactorDto
+    ) {
+        return this.authService.verifyTwoFactor(
+            user,
+            dto.code,
+        );
+    }
 
 }
 
