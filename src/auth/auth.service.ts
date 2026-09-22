@@ -660,5 +660,35 @@ export class AuthService {
         };
     }
 
+    async verifyTwoFactor(
+        user: UserDocument,
+        code: string,
+    ) {
+        if (!user.twoFactorSecret) {
+            throw new BadRequestException(
+                'Two factor authentication is not setup'
+            )
+        }
+
+        const isValid = await this.twoFactorService.verifyCode(
+            user.twoFactorSecret,
+            code,
+        );
+
+        if(!isValid) {
+            throw new UnauthorizedException(
+                'Invalid two-factor authentication code',
+            );
+        }
+
+        await this.userService.enableTwoFactor(
+            user._id.toString(),
+        );
+
+        return {
+            message: 'Two factor authentication enabled successfully'
+        }
+    }
+
     private readonly logger = new Logger(AuthService.name);
 }
