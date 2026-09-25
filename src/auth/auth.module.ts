@@ -12,6 +12,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { QUEUES } from 'src/mail/constants/queue.constants';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
+import { TwoFactorService } from './two-factor.service';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { GithubStrategy } from './strategies/github.strategy';
 ],
 
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard, GoogleStrategy, GithubStrategy],
+  providers: [AuthService, JwtStrategy, RolesGuard, GoogleStrategy, GithubStrategy, TwoFactorService],
   exports:[AuthService]
 })
 
