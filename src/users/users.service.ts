@@ -411,5 +411,18 @@ export class UsersService {
             {new: true},
         );
     }
+
+    async disableTwoFactor(id: string) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                twoFactorEnabled: false,
+                $unset: {
+                    twoFactorSecret: 1,
+                },
+            },
+            {new: true},
+        );
+    }
 }
 
