@@ -193,7 +193,7 @@ export class AuthService {
                 )
             }
         }
-        
+
         await this.userService.updateLoginAttempts(
             user._id.toString(),
             0,
@@ -715,6 +715,36 @@ export class AuthService {
         return {
             message: 'Two factor authentication enabled successfully'
         }
+    }
+
+    async disableTwoFactor(
+        user: UserDocument,
+        password: string
+    ) {
+        if(!user.password) {
+            throw new UnauthorizedException(
+                'This account does not use a password'
+            );
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+        password,
+        user.password
+        );
+
+        if(!isPasswordValid) {
+            throw new UnauthorizedException(
+                'Invalid password'
+            );
+        }
+
+        await this.userService.disableTwoFactor(
+            user._id.toString(),
+        );
+
+        return {
+            message: 'Two factor authentication disabled successfully'
+        };
     }
 
     private readonly logger = new Logger(AuthService.name);
