@@ -424,5 +424,18 @@ export class UsersService {
             {new: true},
         );
     }
+
+    async setTwoFactorRecoveryCodes(
+        id: string,
+        recoveryCodes: string[],
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                twoFactorRecoveryCodes: recoveryCodes
+            },
+            { new: true },
+        );
+    }
 }
 
