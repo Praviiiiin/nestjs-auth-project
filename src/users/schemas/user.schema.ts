@@ -83,6 +83,10 @@ export class User {
     @Prop()
     twoFactorSecret?: string;
 
+    @Prop({ type: [String], default: [] })
+    twoFactorRecoveryCodes!: string[];
+
+
 }    
 
 export const UserSchema = SchemaFactory.createForClass(User)
