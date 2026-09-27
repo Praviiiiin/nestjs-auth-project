@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { generateSecret, generateURI, verify } from 'otplib';
 import * as QRCode from 'qrcode';
+import { randomBytes, createHash } from 'crypto';
 
 @Injectable()
 export class TwoFactorService {
@@ -33,6 +34,13 @@ export class TwoFactorService {
         });
 
         return result.valid
+    }
+
+    generateRecoveryCodes(count = 10): string[] {
+        return Array.from(
+            { length: count },
+            () => randomBytes(5).toString('hex').toUpperCase(),
+        );
     }
     
 }
