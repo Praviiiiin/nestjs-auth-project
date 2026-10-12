@@ -168,31 +168,51 @@ export class AuthService {
             );
         }
 
-        if(user.twoFactorEnabled) {
-            
-            if(!twoFactorCode) {
-                throw new UnauthorizedException(
-                    'Two factor authentication code is required',
-                );
+        
+        if (user.twoFactorEnabled) {
+        if (!twoFactorCode) {
+            throw new UnauthorizedException(
+            'Two-factor authentication code is required.',
+            );
+        }
+        
+        if (/^\d{6}$/.test(twoFactorCode)) {
+            if (!user.twoFactorSecret) {
+            throw new UnauthorizedException(
+                'Two-factor authentication is not configured correctly.',
+            );
             }
 
-            if(!user.twoFactorSecret) {
-                throw new UnauthorizedException(
-                    'Two factor authentication is not configured correctly'
-                );
-            }
-
-            const isTwoFactorValid = await this.twoFactorService.verifyCode(
-                user.twoFactorSecret,
-                twoFactorCode,
+            const isValid = await this.twoFactorService.verifyCode(
+            user.twoFactorSecret,
+            twoFactorCode,
             );
 
-            if(!isTwoFactorValid) {
-                throw new UnauthorizedException(
-                    'Invalid two factor authentication code'
-                )
+            if (!isValid) {
+            throw new UnauthorizedException(
+                'Invalid two-factor authentication code.',
+            );
+            }
+        } else {
+            const recoveryCodeHash =
+            this.twoFactorService.hashRecoveryCode(
+                twoFactorCode.toUpperCase(),
+            );
+
+            const consumed =
+            await this.userService.consumeTwoFactorRecoveryCode(
+                user._id.toString(),
+                recoveryCodeHash,
+            );
+
+            if (!consumed) {
+            throw new UnauthorizedException(
+                'Invalid or already used recovery code.',
+            );
             }
         }
+        }
+
 
         await this.userService.updateLoginAttempts(
             user._id.toString(),
