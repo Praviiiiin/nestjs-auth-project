@@ -42,5 +42,9 @@ export class TwoFactorService {
             () => randomBytes(5).toString('hex').toUpperCase(),
         );
     }
+
+    hashRecoveryCode(code: string): string {
+        return createHash('sha256').update(code).digest('hex')
+    }
     
 }
