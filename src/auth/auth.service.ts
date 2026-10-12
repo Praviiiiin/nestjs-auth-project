@@ -712,9 +712,19 @@ export class AuthService {
             user._id.toString(),
         );
 
+        const recoveryCodes = this.twoFactorService.generateRecoveryCodes();
+
+        const hashedRecoveryCodes = recoveryCodes.map((code) => this.twoFactorService.hashRecoveryCode(code));
+
+        await this.userService.setTwoFactorRecoveryCodes(
+            user._id.toString(),
+            hashedRecoveryCodes,
+        )
+
         return {
-            message: 'Two factor authentication enabled successfully'
-        }
+            message: 'Two factor authentication enabled successfully',
+            recoveryCodes,
+        };
     }
 
     async disableTwoFactor(
