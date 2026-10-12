@@ -437,5 +437,40 @@ export class UsersService {
             { new: true },
         );
     }
+
+    async removeTwoFactorRecoveryCode(
+        id: string,
+        recoveryCodeHash: string,
+    ) {
+        return this.userModel.findByIdAndUpdate(
+            id,
+            {
+                $pull: {
+                    twoFactorRecoveryCodes: recoveryCodeHash,
+                },
+            },
+            {new: true },
+        );
+    }
+
+    async consumeTwoFactorRecoveryCode(
+        id: string,
+        recoveryCodeHash: string
+    ): Promise<boolean> {
+        const result = await this.userModel.updateOne(
+            {
+                _id: id,
+                twoFactorEnabled: true,
+                twoFactorRecoveryCodes: recoveryCodeHash,
+            },
+            {
+                $pull:{
+                    twoFactorRecoveryCodes: recoveryCodeHash,
+                },
+            },
+        );
+
+        return result.modifiedCount === 1;
+    }
 }
 
