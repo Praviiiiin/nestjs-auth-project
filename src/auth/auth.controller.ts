@@ -17,6 +17,8 @@ import { GithubAuthGuard } from './guards/github-auth.guard';
 import type { UserDocument } from 'src/users/schemas/user.schema';
 import { VerifyTwoFactorDto } from './dto/verify-two-factor.dto';
 import { DisableTwoFactorDto } from './dto/disable-two-factor.dto';
+import { ResolveHook } from 'module';
+import { RegenerateRecoveryCodesDto } from './dto/regenerate-recovery-codes.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -200,12 +202,24 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     async deleteTwoFactor(
         @CurrentUser() user:UserDocument,
-        @Body() dto: DisableTwoFactorDto,
+    @Body() dto: DisableTwoFactorDto,
     ) {
         return this.authService.disableTwoFactor(
             user,
             dto.password,
         )
+    }
+
+    @Post('2fa/recovery-codes/regenerate')
+    @UseGuards(JwtAuthGuard)
+    async regenrateRecoveryCodes(
+        @CurrentUser() user: any,
+        @Body() dto: RegenerateRecoveryCodesDto,
+    ) {
+        return this.authService.regenarateRecoveryCodes(
+            user.userId,
+            dto.twoFactorCode,
+        );
     }
 
 }
