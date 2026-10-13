@@ -777,5 +777,44 @@ export class AuthService {
         };
     }
 
+    async regenarateRecoveryCodes(
+        userId: string,
+        twoFactorCode: string,
+    ) {
+        const user = await this.userService.findById(userId);
+
+        if(!user || !user.twoFactorEnabled) {
+            throw new UnauthorizedException(
+                'Two-factor authentication is not enabled. ',
+            );
+        }
+
+        if(!user.twoFactorSecret) {
+            throw new UnauthorizedException(
+                'Two-factor authentication is not configured correctly. '
+            );
+        }
+
+        const isValid = await this.twoFactorService.verifyCode(
+            user.twoFactorSecret,
+            twoFactorCode,
+        );
+
+        if(!isValid) {
+            throw new UnauthorizedException(
+                'Invalid Two-factor authentication code.',
+            );
+        }
+
+        const recoveryCodes = this.twoFactorService.generateRecoveryCodes();
+
+        const hashedRecoveryCodes = recoveryCodes.map((code) => this.twoFactorService.hashRecoveryCode(code));
+
+        await this.userService.setTwoFactorRecoveryCodes(
+            userId,
+            hashedRecoveryCodes,
+        )
+    }
+
     private readonly logger = new Logger(AuthService.name);
 }
