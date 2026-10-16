@@ -210,6 +210,12 @@ export class AuthController {
         )
     }
 
+    @Throttle({
+        default: {
+            limit: THROTTLER.RECOVERY_CODES_REGENRATE.LIMIT,
+            ttl: THROTTLER.RECOVERY_CODES_REGENRATE.TTL,
+        },
+    })
     @Post('2fa/recovery-codes/regenerate')
     @UseGuards(JwtAuthGuard)
     async regenrateRecoveryCodes(
