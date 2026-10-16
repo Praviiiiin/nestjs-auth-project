@@ -1,7 +1,9 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 
 export class RegenerateRecoveryCodesDto {
     @IsString()
-    @Length(6, 6)
-    twoFactorCode!: string;
+    @Matches(/^\d{6}$/, {
+        message: 'Two-factor code must contain exatly 6 digits. '
+    })
+    twoFactorCode!: string;    
 }
