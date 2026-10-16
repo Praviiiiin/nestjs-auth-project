@@ -27,5 +27,10 @@ export const THROTTLER = {
     RESEND_VERIFICATION: {
         TTL: 60 * 60 * 1000,
         LIMIT: 3,
-    }
+    },
+
+    RECOVERY_CODES_REGENRATE: {
+        TTL: 60 * 60 * 1000,
+        LIMIT: 3,
+    },
 } as const;
