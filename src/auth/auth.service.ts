@@ -100,10 +100,18 @@ export class AuthService {
             twoFactorCode,
         } = body;
 
+        const dbStart = performance.now();
+
         const user =
             await this.userService.findByEmail(
                 email,
             );
+        
+        console.log(
+            `[LOGIN PERF] findByEmail: ${
+                (performance.now() - dbStart).toFixed(2)
+            } ms`,
+        )
 
         if (!user) {
             throw new BadRequestException(
@@ -126,11 +134,19 @@ export class AuthService {
             );
         }
 
+        const bcryptStart = performance.now();
+
         const isPasswordValid =
             await bcrypt.compare(
                 password,
                 user.password,
             );
+
+        console.log(
+            `[LOGIN PERF] bcrypt.compare: ${
+                (performance.now() - bcryptStart).toFixed(2)
+            } ms`,
+        );
 
         if (!isPasswordValid) {
 
@@ -220,9 +236,18 @@ export class AuthService {
             undefined,
         );
 
-        return await this.generateAuthResponse(
+        const tokenStart = performance.now();
+
+        const response =  await this.generateAuthResponse(
             user,
         );
+
+        console.log(
+            `[LOGIN PERF] generateAuthResponse: ${
+                (performance.now() - tokenStart).toFixed(2)
+            } ms`,
+        )
+        return response;
 
     }
 
