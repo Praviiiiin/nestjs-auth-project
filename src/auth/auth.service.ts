@@ -291,10 +291,19 @@ export class AuthService {
         );
         
 
+        const refreshDbStart = performance.now();
+
         await this.userService.updateRefreshToken(
             user._id.toString(),
             hashedRefreshToken,
         );
+        
+        console.log(
+            `[LOGIN PERF] updateRefreshToken : ${
+                (performance.now() - refreshDbStart).toFixed(2)
+            } ms`
+        );
+        
 
         return {
             message:
