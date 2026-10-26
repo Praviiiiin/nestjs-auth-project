@@ -15,6 +15,7 @@ import { GoogleUserDto } from './dto/google-user.dto';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { GithubUserDto } from './dto/github-user.dto';
 import { TwoFactorService } from './two-factor.service';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -274,12 +275,21 @@ export class AuthService {
                     expiresIn: '7d',
                 },
             );
+        
+        const refreshHashStart = performance.now();
 
         const hashedRefreshToken =
             await bcrypt.hash(
                 refreshToken,
                 10,
             );
+        
+        console.log(
+            `[LOGIN PERF] refreshToken bcrypt.hash: ${
+                (performance.now() - refreshHashStart).toFixed(2)
+            } ms`
+        );
+        
 
         await this.userService.updateRefreshToken(
             user._id.toString(),
