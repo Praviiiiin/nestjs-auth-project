@@ -92,4 +92,14 @@ export class User {
 
 }    
 
-export const UserSchema = SchemaFactory.createForClass(User)
+export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index(
+        { googleId : 1},
+        {
+            unique: true,
+            partialFilterExpression: {
+                googleId: { $type: 'string'},
+            },
+        },
+    );
