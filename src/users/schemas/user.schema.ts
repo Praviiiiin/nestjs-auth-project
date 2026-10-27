@@ -23,7 +23,10 @@ export class User {
     @Prop()
     githubId?: string;
 
-    @Prop()
+    @Prop({
+        type: String,
+        trim: true,
+    })
     googleId?: string;
 
     @Prop()
