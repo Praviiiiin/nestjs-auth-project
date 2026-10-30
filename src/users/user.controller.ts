@@ -68,7 +68,7 @@ export class UsersController {
         @Param('id')
         id: string,
     ) {
-        return this.usersService.findUserById(id);
+        return this.usersService.findById(id);
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
