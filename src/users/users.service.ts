@@ -36,7 +36,7 @@ export class UsersService {
             return this.userModel.hydrate(cachedUser)
         }
 
-        const user = await this.userModel.findById(id).select('-password:0, -refreshToken:0, -resetPassword:0, -resetPasswordExpires:0, -emailVerificationToken:0, -emailVerificationTokenExpires');
+        const user = await this.userModel.findById(id).select('-password: 0, -refreshToken: 0, -resetPassword: 0, -resetPasswordExpires: 0, -emailVerificationToken: 0, -emailVerificationTokenExpires: 0, twoFactorSecret: 0, twoFactorRecoveryCodes: 0, failedLoginAttempts: 0, lockUntil: 0');
 
         if(!user) {
             return null;
@@ -495,7 +495,7 @@ export class UsersService {
                 },
             },
         );
-
+    
         return result.modifiedCount === 1;
     }
 }
