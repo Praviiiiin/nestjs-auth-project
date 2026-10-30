@@ -401,7 +401,7 @@ export class UsersService {
         id: string,
         secret: string,
     ){
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 twoFactorSecret: secret,
@@ -409,29 +409,46 @@ export class UsersService {
             },
             { new: true },
         );
+
+        if(user) {
+            await this.invalidateUserCache(id);
+        }
+
+        return user;
     }
 
     async enableTwoFactor(id : string) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 twoFactorEnabled: true,
             },
             {new: true},
         );
+
+        if(user) {
+            await this.invalidateUserCache(id);
+        }
     }
 
     async disableTwoFactor(id: string) {
-        return this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             id,
             {
                 twoFactorEnabled: false,
                 $unset: {
                     twoFactorSecret: 1,
+                    twoFactorRecoveryCodes: 1,
                 },
             },
             {new: true},
         );
+
+        if(user) {
+            await this.invalidateUserCache(id);
+        }
+
+        return user;
     }
 
     async setTwoFactorRecoveryCodes(
