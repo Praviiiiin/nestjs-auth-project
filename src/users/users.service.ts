@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema'
@@ -10,6 +10,8 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
+    private readonly logger = new Logger(UsersService.name);
+
     constructor(
         @InjectModel(User.name)
         private userModel: Model<UserDocument>,
@@ -26,7 +28,7 @@ export class UsersService {
 
     async findById(id: string) {
 
-        type CachedUser = Omit<User, never> & { _id: string };
+        type CachedUser = User & { _id: string };
         const cacheKey = CACHE_KEYS.USER(id);
         const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
 
@@ -34,17 +36,22 @@ export class UsersService {
             return this.userModel.hydrate(cachedUser)
         }
 
-        const user = await this.userModel.findById(id).select('-password -refreshToken -resetPassword -resetPasswordExpires -emailVerificationToken, -emailVerificationTokenExpires');
+        const user = await this.userModel.findById(id).select('-password:0, -refreshToken:0, -resetPassword:0, -resetPasswordExpires:0, -emailVerificationToken:0, -emailVerificationTokenExpires');
 
         if(!user) {
             return null;
         }
 
-        await this.redisService.set(
-            cacheKey,
-            user,
-            CACHE.USER_TTL,
-        );
+        try {
+            await this.redisService.set(
+                cacheKey,
+                user.toObject(),
+                CACHE.USER_TTL,
+            );
+        } catch (error) {
+            this.logger.warn(`Redis Cache write failed for user${id}.`);
+            
+        }
 
         return user;
     }
@@ -53,12 +60,14 @@ export class UsersService {
         return this.userModel.findById(id);
     }
 
-    async invalidateUserCache(
-        userId: string,
-    ) {
-        await this.redisService.del(
-            CACHE_KEYS.USER(userId),        
-        );
+    async invalidateUserCache(userId: string): Promise<void> {
+        try {
+            await this.redisService.del(
+                CACHE_KEYS.USER(userId)        
+            );
+        } catch (error) {
+            this.logger.warn(`Failed to invalidate cache for user ${userId}.`)
+        }
     }
 
     async findByIdFromDatabase(id: string) {
