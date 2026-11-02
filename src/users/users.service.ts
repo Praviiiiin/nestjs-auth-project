@@ -36,7 +36,7 @@ export class UsersService {
             return this.userModel.hydrate(cachedUser)
         }
 
-        const user = await this.userModel.findById(id).select('-password: 0, -refreshToken: 0, -resetPassword: 0, -resetPasswordExpires: 0, -emailVerificationToken: 0, -emailVerificationTokenExpires: 0, twoFactorSecret: 0, twoFactorRecoveryCodes: 0, failedLoginAttempts: 0, lockUntil: 0');
+        const user = await this.userModel.findById(id).select('-password ' + '-refreshToken '+  '-resetPassword ' + '-resetPasswordExpires ' +  '-emailVerificationToken '+ '-emailVerificationTokenExpires ' + '-twoFactorSecret ' + '-twoFactorRecoveryCodes ' + '-failedLoginAttempts ' +  '-lockUntil');
 
         if(!user) {
             return null;
@@ -47,7 +47,7 @@ export class UsersService {
                 cacheKey,
                 user.toObject(),
                 CACHE.USER_TTL,
-            );
+            );  
         } catch (error) {
             this.logger.warn(`Redis Cache write failed for user${id}.`);
             
@@ -186,7 +186,7 @@ export class UsersService {
 
     async findUserById(
         id: string,
-    ) {
+    ) { 
         return this.userModel.findById(id).select('-password -refreshToken');
     }
 
