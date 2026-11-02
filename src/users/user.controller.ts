@@ -61,6 +61,12 @@ export class UsersController {
         return this.usersService.findAll(Number(query.page) || 1, Number(query.limit) || 10, query.search || '');
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('cache-test/me')
+    async cacheTest(@CurrentUser() user:any ) {
+        return this.usersService.findById(user._id);
+    }
+
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Get(':id')
