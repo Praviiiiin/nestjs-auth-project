@@ -30,11 +30,16 @@ export class UsersService {
 
         type CachedUser = User & { _id: string };
         const cacheKey = CACHE_KEYS.USER(id);
+        console.log('{CACHE DEBUG Generated Key:', cacheKey );
         const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
 
         if(cachedUser) {
+            console.log('[CACHE DEBUG] Cache HIT:', cacheKey);
+            
             return this.userModel.hydrate(cachedUser)
         }
+        console.log('[CACHE DEBUG] Cache Miss:', cacheKey);
+        
 
         const user = await this.userModel.findById(id).select('-password ' + '-refreshToken '+  '-resetPassword ' + '-resetPasswordExpires ' +  '-emailVerificationToken '+ '-emailVerificationTokenExpires ' + '-twoFactorSecret ' + '-twoFactorRecoveryCodes ' + '-failedLoginAttempts ' +  '-lockUntil');
 
@@ -42,12 +47,20 @@ export class UsersService {
             return null;
         }
 
+        console.log('[CACHE DEBUG] Writing user to Redis', cacheKey);
+        
+
         try {
+
+            console.log('[CACHE DEBUG] Writing user to Redis', cacheKey);
+
             await this.redisService.set(
                 cacheKey,
                 user.toObject(),
                 CACHE.USER_TTL,
             );  
+
+            console.log('[CACHE DEBUG] Redis write successful');
         } catch (error) {
             this.logger.warn(`Redis Cache write failed for user${id}.`);
             
