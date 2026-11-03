@@ -79,7 +79,7 @@ export class UsersService {
                 CACHE_KEYS.USER(userId)        
             );
         } catch (error) {
-            this.logger.warn(`Failed to invalidate cache for user ${userId}.`)
+            this.logger.warn(`Failed to invalidate cache for user ${userId}`, error instanceof Error ? error.stack : undefined,);
         }
     }
 
