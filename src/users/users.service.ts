@@ -26,48 +26,70 @@ export class UsersService {
         return this.userModel.findOne({ email });
     }
 
-    async findById(id: string) {
+    
+async findById(id: string) {
+    type CachedUser = User & { _id: string };
 
-        type CachedUser = User & { _id: string };
-        const cacheKey = CACHE_KEYS.USER(id);
-        console.log('{CACHE DEBUG Generated Key:', cacheKey );
-        const cachedUser = await this.redisService.get<CachedUser>(cacheKey);
+    const cacheKey = CACHE_KEYS.USER(id);
 
-        if(cachedUser) {
+    console.log('[CACHE DEBUG] Generated Key:', cacheKey);
+
+    try {
+        const cachedUser =
+            await this.redisService.get<CachedUser>(cacheKey);
+
+        if (cachedUser) {
             console.log('[CACHE DEBUG] Cache HIT:', cacheKey);
-            
-            return this.userModel.hydrate(cachedUser)
-        }
-        console.log('[CACHE DEBUG] Cache Miss:', cacheKey);
-        
-
-        const user = await this.userModel.findById(id).select('-password ' + '-refreshToken '+  '-resetPassword ' + '-resetPasswordExpires ' +  '-emailVerificationToken '+ '-emailVerificationTokenExpires ' + '-twoFactorSecret ' + '-twoFactorRecoveryCodes ' + '-failedLoginAttempts ' +  '-lockUntil');
-
-        if(!user) {
-            return null;
+            return this.userModel.hydrate(cachedUser);
         }
 
-        console.log('[CACHE DEBUG] Writing user to Redis', cacheKey);
-        
+        console.log('[CACHE DEBUG] Cache MISS:', cacheKey);
 
-        try {
-
-            console.log('[CACHE DEBUG] Writing user to Redis', cacheKey);
-
-            await this.redisService.set(
-                cacheKey,
-                user.toObject(),
-                CACHE.USER_TTL,
-            );  
-
-            console.log('[CACHE DEBUG] Redis write successful');
-        } catch (error) {
-            this.logger.warn(`Redis Cache write failed for user${id}.`);
-            
-        }
-
-        return user;
+    } catch (error) {
+        this.logger.warn(
+            `Redis cache read failed for user ${id}. Falling back to MongoDB.`,
+        );
     }
+
+    const user = await this.userModel
+        .findById(id)
+        .select(
+            '-password ' +
+            '-refreshToken ' +
+            '-resetPassword ' +
+            '-resetPasswordExpires ' +
+            '-emailVerificationToken ' +
+            '-emailVerificationTokenExpires ' +
+            '-twoFactorSecret ' +
+            '-twoFactorRecoveryCodes ' +
+            '-failedLoginAttempts ' +
+            '-lockUntil'
+        );
+
+    if (!user) {
+        return null;
+    }
+
+    try {
+        console.log('[CACHE DEBUG] Writing user to Redis:', cacheKey);
+
+        await this.redisService.set(
+            cacheKey,
+            user.toObject(),
+            CACHE.USER_TTL,
+        );
+
+        console.log('[CACHE DEBUG] Redis write successful');
+
+    } catch (error) {
+        this.logger.warn(
+            `Redis cache write failed for user ${id}.`,
+        );
+    }
+
+    return user;
+}
+
 
     async findByIdWithCredentials(id: string) {
         return this.userModel.findById(id);
@@ -99,8 +121,12 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(CACHE_KEYS.USER(id))
+        if(user) {
+            await this.invalidateUserCache(id);
+        }
+
         return user;
+
     }
 
     async updatePassword(
@@ -212,9 +238,11 @@ export class UsersService {
 
         const deletedUser = await this.userModel.findByIdAndDelete(id);
 
-        await this.redisService.del(
-            CACHE_KEYS.USER(id),
-        );
+        if(!deletedUser) {
+            return null;
+        }
+
+        await this.invalidateUserCache(id);
 
         if(user.avatarPublic) {
             try {
@@ -243,9 +271,9 @@ export class UsersService {
             }
         ).select('-password -refreshToken');
 
-        await this.redisService.del(
-            CACHE_KEYS.USER(id),
-        );
+        if(user) {
+            await this.invalidateUserCache(id);
+        }
 
         return user;
 
@@ -403,9 +431,9 @@ export class UsersService {
             },
         );
 
-        await this.redisService.del(
-            CACHE_KEYS.USER(userId),
-        );
+        if(user) {
+            await this.invalidateUserCache(userId);
+        }
 
         return user;
     }
