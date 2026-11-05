@@ -21,7 +21,13 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       envFilePath: 'src/.env',
     }),
     
-    MongooseModule.forRoot(process.env.MONGODB_URI!),
+    MongooseModule.forRoot(process.env.MONGODB_URI!, {
+      maxPoolSize: 20,
+      minPoolSize: 2,
+      maxConnecting: 2,
+      maxIdleTimeMS: 60000,
+      serverSelectionTimeoutMS: 5000,
+    }),
 
     BullModule.forRoot({
       connection: {
