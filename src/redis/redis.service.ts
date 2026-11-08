@@ -121,4 +121,82 @@ export class RedisService implements OnModuleDestroy {
         await this.redis.quit();
         this.logger.log('Redis connection closed gracefully');
     }
+
+    async incrementRateLimit(
+    counterKey: string,
+    blockKey: string,
+    ttl: number,
+    limit: number,
+    blockDuration: number,
+): Promise<{
+    totalHits: number;
+    timeToExpire: number;
+    isBlocked: boolean;
+    timeToBlockExpire: number;
+}> {
+    const script = `
+        local blockTTL = redis.call('PTTL', KEYS[2])
+        local currentHits = tonumber(redis.call('GET', KEYS[1]) or '0')
+        local counterTTL = redis.call('PTTL', KEYS[1])
+
+        -- Client is already blocked
+        if blockTTL > 0 then
+            return {
+                currentHits,
+                math.max(counterTTL, 0),
+                1,
+                blockTTL
+            }
+        end
+
+        -- Increment counter atomically
+        local hits = redis.call('INCR', KEYS[1])
+
+        -- Set expiration on first request
+        if hits == 1 then
+            redis.call('PEXPIRE', KEYS[1], ARGV[1])
+        end
+
+        local timeToExpire = redis.call('PTTL', KEYS[1])
+
+        -- Block when request limit is exceeded
+        if hits > tonumber(ARGV[2]) then
+            redis.call('SET', KEYS[2], '1', 'PX', ARGV[3])
+
+            -- Reset the counter when the block expires
+            redis.call('PEXPIRE', KEYS[1], ARGV[3])
+
+            return {
+                hits,
+                tonumber(ARGV[3]),
+                1,
+                tonumber(ARGV[3])
+            }
+        end
+
+        return {
+            hits,
+            math.max(timeToExpire, 0),
+            0,
+            0
+        }
+    `;
+
+    const result = await this.redis.eval(
+        script,
+        2,
+        counterKey,
+        blockKey,
+        String(ttl),
+        String(limit),
+        String(blockDuration),
+    ) as number[];
+
+    return {
+        totalHits: Number(result[0]),
+        timeToExpire: Number(result[1]),
+        isBlocked: Number(result[2]) === 1,
+        timeToBlockExpire: Number(result[3]),
+    };
+}
 }
