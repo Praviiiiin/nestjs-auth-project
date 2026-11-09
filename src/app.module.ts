@@ -12,6 +12,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { UploadModule } from './upload/upload.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { RedisThrottlerStorage } from './redis/redis.throttler.storage';
+import { RedisService } from './redis/redis.service';
 
 
 @Module({
@@ -39,14 +41,20 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       },
     }),
 
-    ThrottlerModule.forRoot({
-      throttlers: [
-        { 
-          ttl: THROTTLER.GLOBAL.TTL,
-          limit: THROTTLER.GLOBAL.LIMIT,
-        },
-      ],
+    ThrottlerModule.forRootAsync({
+      imports: [RedisModule],
+      inject: [RedisService],
+      useFactory: (redisService: RedisService) => ({
+        throttlers: [
+          {
+            ttl: THROTTLER.GLOBAL.TTL,
+            limit: THROTTLER.GLOBAL.LIMIT,
+          },
+        ],
+        storage: new RedisThrottlerStorage(redisService),
+      }),
     }),
+        
 
     AuthModule,
     UsersModule,
