@@ -89,6 +89,9 @@ export class User {
     @Prop({ type: [String], default: [] })
     twoFactorRecoveryCodes!: string[];
 
+    declare createdAt: Date;
+    declare updatedAt: Date;
+
 
 }    
 
