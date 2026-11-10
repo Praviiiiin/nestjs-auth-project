@@ -1,9 +1,5 @@
-import {
-    Injectable,
-    Logger,
-    OnModuleDestroy,
-} from '@nestjs/common';
-
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 
@@ -134,49 +130,87 @@ export class RedisService implements OnModuleDestroy {
     isBlocked: boolean;
     timeToBlockExpire: number;
 }> {
-    const script = `
-        local blockTTL = redis.call('PTTL', KEYS[2])
-        local currentHits = tonumber(redis.call('GET', KEYS[1]) or '0')
-        local counterTTL = redis.call('PTTL', KEYS[1])
+    if (!Number.isFinite(ttl) || ttl <= 0) {
+        throw new Error('Rate limit TTL must be positive');
+    }
 
-        -- Client is already blocked
-        if blockTTL > 0 then
+    if (!Number.isInteger(limit) || limit < 1) {
+        throw new Error('Rate limit must be a positive integer');
+    }
+
+    if (!Number.isFinite(blockDuration) || blockDuration <= 0) {
+        throw new Error('Block duration must be positive');
+    }
+
+    const now = Date.now();
+    const requestId = `${now}:${randomUUID()}`;
+
+    const script = `
+        local now = tonumber(ARGV[1])
+        local window = tonumber(ARGV[2])
+        local limit = tonumber(ARGV[3])
+        local blockDuration = tonumber(ARGV[4])
+        local requestId = ARGV[5]
+
+        -- Check whether this tracker is already blocked.
+        local blockedHits = redis.call('GET', KEYS[2])
+
+        if blockedHits then
+            local blockTTL = redis.call('PTTL', KEYS[2])
+
             return {
-                currentHits,
-                math.max(counterTTL, 0),
+                tonumber(blockedHits),
+                0,
                 1,
-                blockTTL
+                math.ceil(blockTTL / 1000)
             }
         end
 
-        -- Increment counter atomically
-        local hits = redis.call('INCR', KEYS[1])
+        -- Remove requests outside the sliding window.
+        local cutoff = now - window
+        redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', cutoff)
 
-        -- Set expiration on first request
-        if hits == 1 then
-            redis.call('PEXPIRE', KEYS[1], ARGV[1])
+        -- Record this request.
+        redis.call('ZADD', KEYS[1], now, requestId)
+        redis.call('PEXPIRE', KEYS[1], window)
+
+        local totalHits = redis.call('ZCARD', KEYS[1])
+
+        -- Calculate when the oldest request expires.
+        local oldest = redis.call('ZRANGE', KEYS[1], 0, 0, 'WITHSCORES')
+        local timeToExpire = 0
+
+        if #oldest > 0 then
+            timeToExpire = math.ceil(
+                (tonumber(oldest[2]) + window - now) / 1000
+            )
         end
 
-        local timeToExpire = redis.call('PTTL', KEYS[1])
+        -- Block when the request count exceeds the limit.
+        if totalHits > limit then
+            redis.call(
+                'SET',
+                KEYS[2],
+                totalHits,
+                'PX',
+                blockDuration
+            )
 
-        -- Block when request limit is exceeded
-        if hits > tonumber(ARGV[2]) then
-            redis.call('SET', KEYS[2], '1', 'PX', ARGV[3])
-
-            -- Reset the counter when the block expires
-            redis.call('PEXPIRE', KEYS[1], ARGV[3])
+            -- Clear the old window. A request after the block
+            -- expires starts a fresh counting window.
+            redis.call('DEL', KEYS[1])
 
             return {
-                hits,
-                tonumber(ARGV[3]),
+                totalHits,
+                timeToExpire,
                 1,
-                tonumber(ARGV[3])
+                math.ceil(blockDuration / 1000)
             }
         end
 
         return {
-            hits,
-            math.max(timeToExpire, 0),
+            totalHits,
+            timeToExpire,
             0,
             0
         }
@@ -187,9 +221,11 @@ export class RedisService implements OnModuleDestroy {
         2,
         counterKey,
         blockKey,
+        String(now),
         String(ttl),
         String(limit),
         String(blockDuration),
+        requestId,
     ) as number[];
 
     return {
@@ -199,4 +235,7 @@ export class RedisService implements OnModuleDestroy {
         timeToBlockExpire: Number(result[3]),
     };
 }
+
+    
+
 }
