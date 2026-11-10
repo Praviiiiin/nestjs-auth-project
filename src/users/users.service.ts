@@ -39,11 +39,11 @@ async findById(id: string) {
             await this.redisService.get<CachedUser>(cacheKey);
 
         if (cachedUser) {
-            console.log('[CACHE DEBUG] Cache HIT:', cacheKey);
-            return this.userModel.hydrate(cachedUser);
+            this.logger.debug(`Cache HIT: ${cacheKey}`);
+            return cachedUser;
         }
 
-        console.log('[CACHE DEBUG] Cache MISS:', cacheKey);
+        this.logger.debug(`Cache MISS: ${cacheKey}`);
 
     } catch (error) {
         this.logger.warn(
@@ -64,10 +64,22 @@ async findById(id: string) {
             '-twoFactorRecoveryCodes ' +
             '-failedLoginAttempts ' +
             '-lockUntil'
-        );
+        ).lean().exec();
 
     if (!user) {
         return null;
+    }
+
+    const safeUser = {
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        provider: user.provider,
+        twoFactorEnabled: user.twoFactorEnabled,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
     }
 
     try {
@@ -75,11 +87,11 @@ async findById(id: string) {
 
         await this.redisService.set(
             cacheKey,
-            user.toObject(),
+            safeUser,
             CACHE.USER_TTL,
         );
 
-        console.log('[CACHE DEBUG] Redis write successful');
+        this.logger.debug(`Cache write successful: ${cacheKey}`);
 
     } catch (error) {
         this.logger.warn(
@@ -87,7 +99,7 @@ async findById(id: string) {
         );
     }
 
-    return user;
+    return safeUser;
 }
 
 
