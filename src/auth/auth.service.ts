@@ -825,7 +825,7 @@ export class AuthService {
         userId: string,
         twoFactorCode: string,
     ) {
-        const user = await this.userService.findById(userId);
+        const user = await this.userService.findByIdWithCredentials(userId);
 
         if(!user || !user.twoFactorEnabled) {
             throw new UnauthorizedException(
